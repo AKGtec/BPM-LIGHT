@@ -38,6 +38,14 @@ export const routes: Routes = [
     loadComponent: () => import('./shared/components/unauthorized/unauthorized.component').then(c => c.UnauthorizedComponent)
   },
   {
+    path: 'notifications',
+    loadComponent: () => import('./shared/components/notification-list/notification-list.component').then(c => c.NotificationListComponent)
+  },
+  {
+    path: 'icon-test',
+    loadComponent: () => import('./shared/components/icon-test/icon-test.component').then(c => c.IconTestComponent)
+  },
+  {
     path: '**',
     loadComponent: () => import('./shared/components/not-found/not-found.component').then(c => c.NotFoundComponent)
   }

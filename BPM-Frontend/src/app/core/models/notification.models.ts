@@ -11,6 +11,7 @@ export enum NotificationType {
 
 export interface NotificationDto extends BaseDto {
   userId: string;
+  title: string;
   message: string;
   isRead: boolean;
   type: NotificationType;
@@ -21,6 +22,7 @@ export interface NotificationDto extends BaseDto {
 
 export interface CreateNotificationDto {
   userId: string;
+  title: string;
   message: string;
   type: NotificationType;
   actionUrl?: string;

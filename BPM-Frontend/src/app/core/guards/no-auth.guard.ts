@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 import { Observable, map, take } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
@@ -7,20 +7,17 @@ import { AuthService } from '../services/auth.service';
   providedIn: 'root'
 })
 export class NoAuthGuard implements CanActivate {
-  
   constructor(
     private authService: AuthService,
     private router: Router
   ) {}
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> | Promise<boolean> | boolean {
+  canActivate(): Observable<boolean> {
     return this.authService.isAuthenticated$.pipe(
       take(1),
       map(isAuthenticated => {
         if (isAuthenticated) {
+          // User is already authenticated, redirect to dashboard
           this.router.navigate(['/dashboard']);
           return false;
         }

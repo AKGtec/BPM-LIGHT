@@ -1,0 +1,78 @@
+.reporting-dashboard-container {
+  padding: 20px;
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  p {
+    text-align: center;
+    color: #555;
+    margin-bottom: 30px;
+  }
+
+  .stats-section,
+  .report-generation-section,
+  .logs-section {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+
+    h3 {
+      color: #007bff;
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+  }
+
+  .stats-section ul {
+    list-style: none;
+    padding: 0;
+
+    li {
+      padding: 8px 0;
+      border-bottom: 1px dashed #e0e0e0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .report-generation-section {
+    text-align: center;
+
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 0 10px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #218838;
+      }
+
+      &:last-child {
+        background-color: #17a2b8;
+
+        &:hover {
+          background-color: #138496;
+        }
+      }
+    }
+  }
+
+  .logs-section p {
+    text-align: left;
+    color: #777;
+    font-style: italic;
+  }
+}

@@ -1,178 +1,220 @@
-.register-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
-}
-
 .register-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  padding: 40px;
   width: 100%;
-  max-width: 600px;
-}
-
-.register-header {
-  text-align: center;
-  margin-bottom: 30px;
-
-  h1 {
-    color: #333;
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-
-  p {
-    color: #666;
-    font-size: 1rem;
-    margin: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  
+  mat-card-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    
+    mat-card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    
+    mat-card-subtitle {
+      color: #666;
+      font-size: 0.9rem;
+    }
   }
 }
 
 .register-form {
-  .form-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 0;
-
-    .form-group {
-      flex: 1;
-    }
-  }
-
-  .form-group {
-    margin-bottom: 20px;
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #333;
-      font-weight: 500;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 12px 15px;
-      border: 2px solid #e1e5e9;
-      border-radius: 5px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-
-      &:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-      }
-
-      &.is-invalid {
-        border-color: #dc3545;
-      }
-    }
-
-    .invalid-feedback {
-      color: #dc3545;
-      font-size: 0.875rem;
-      margin-top: 5px;
-    }
-  }
-
-  .success-message {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 12px 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-
-    i {
-      margin-right: 10px;
-    }
-  }
-
-  .error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 12px 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-
-    i {
-      margin-right: 10px;
-    }
-  }
-
-  .btn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  .full-width {
     width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &.btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-
-      &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-      }
-
-      &:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-      }
-    }
   }
-
-  .spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-    margin-right: 10px;
+  
+  .half-width {
+    width: calc(50% - 0.5rem);
+  }
+  
+  .name-row {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  mat-form-field {
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 0.5rem;
+    }
   }
 }
 
-.register-footer {
-  text-align: center;
-  margin-top: 30px;
+.terms-section {
+  margin: 0.5rem 0 1.5rem 0;
+  
+  mat-checkbox {
+    font-size: 0.875rem;
+    
+    .mat-checkbox-label {
+      line-height: 1.4;
+    }
+  }
+  
+  .terms-link {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+  }
+  
+  mat-error {
+    font-size: 0.75rem;
+    color: #f44336;
+    margin-top: 0.5rem;
+    display: block;
+  }
+}
 
-  p {
+.register-button {
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  mat-spinner {
+    margin-right: 8px;
+  }
+}
+
+.card-actions {
+  padding: 1rem 0 0 0;
+  justify-content: center;
+  
+  .signin-text {
+    text-align: center;
     color: #666;
+    font-size: 0.9rem;
     margin: 0;
-
-    a {
+    
+    .signin-link {
       color: #667eea;
       text-decoration: none;
-      font-weight: 600;
-
+      font-weight: 500;
+      transition: color 0.3s ease;
+      
       &:hover {
+        color: #764ba2;
         text-decoration: underline;
       }
     }
   }
 }
 
+// Custom snackbar styles
+:host ::ng-deep {
+  .success-snackbar {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .error-snackbar {
+    background-color: #f44336;
+    color: white;
+  }
+}
+
+// Responsive Design
 @media (max-width: 768px) {
-  .register-card {
-    padding: 30px 20px;
-  }
-
-  .form-row {
+  .name-row {
     flex-direction: column;
-    gap: 0;
+    gap: 1rem;
+    
+    .half-width {
+      width: 100%;
+    }
   }
+}
 
-  .register-header h1 {
-    font-size: 1.5rem;
+@media (max-width: 480px) {
+  .register-button {
+    height: 44px;
+    font-size: 0.9rem;
+  }
+  
+  .terms-section {
+    mat-checkbox {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+// Animation for form elements
+.register-form {
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Password strength indicator (optional enhancement)
+.password-strength {
+  margin-top: 0.5rem;
+  
+  .strength-bar {
+    height: 4px;
+    background-color: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+    
+    .strength-fill {
+      height: 100%;
+      transition: all 0.3s ease;
+      
+      &.weak {
+        width: 33%;
+        background-color: #f44336;
+      }
+      
+      &.medium {
+        width: 66%;
+        background-color: #ff9800;
+      }
+      
+      &.strong {
+        width: 100%;
+        background-color: #4caf50;
+      }
+    }
+  }
+  
+  .strength-text {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    
+    &.weak { color: #f44336; }
+    &.medium { color: #ff9800; }
+    &.strong { color: #4caf50; }
   }
 }

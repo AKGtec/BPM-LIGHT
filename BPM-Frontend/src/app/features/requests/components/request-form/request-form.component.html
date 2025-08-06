@@ -1,0 +1,203 @@
+<div class="request-form-container">
+  <h2>Submit {{ requestType | titlecase }} Request</h2>
+
+  <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
+    <ng-container [ngSwitch]="requestType">
+      <ng-template ngSwitchCase="leave">
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate" formControlName="startDate" />
+          <div
+            *ngIf="
+              requestForm.get('startDate')?.invalid &&
+              requestForm.get('startDate')?.touched
+            "
+            class="error-message"
+          >
+            Start Date is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate" formControlName="endDate" />
+          <div
+            *ngIf="
+              requestForm.get('endDate')?.invalid &&
+              requestForm.get('endDate')?.touched
+            "
+            class="error-message"
+          >
+            End Date is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reason">Reason:</label>
+          <textarea id="reason" formControlName="reason"></textarea>
+          <div
+            *ngIf="
+              requestForm.get('reason')?.invalid &&
+              requestForm.get('reason')?.touched
+            "
+            class="error-message"
+          >
+            Reason is required.
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template ngSwitchCase="expense">
+        <div class="form-group">
+          <label for="amount">Amount:</label>
+          <input type="number" id="amount" formControlName="amount" />
+          <div
+            *ngIf="
+              requestForm.get('amount')?.invalid &&
+              requestForm.get('amount')?.touched
+            "
+            class="error-message"
+          >
+            Amount is required and must be a positive number.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea id="description" formControlName="description"></textarea>
+          <div
+            *ngIf="
+              requestForm.get('description')?.invalid &&
+              requestForm.get('description')?.touched
+            "
+            class="error-message"
+          >
+            Description is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="receipt">Receipt:</label>
+          <input type="file" id="receipt" formControlName="receipt" />
+        </div>
+      </ng-template>
+
+      <ng-template ngSwitchCase="training">
+        <div class="form-group">
+          <label for="courseName">Course Name:</label>
+          <input type="text" id="courseName" formControlName="courseName" />
+          <div
+            *ngIf="
+              requestForm.get('courseName')?.invalid &&
+              requestForm.get('courseName')?.touched
+            "
+            class="error-message"
+          >
+            Course Name is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="provider">Provider:</label>
+          <input type="text" id="provider" formControlName="provider" />
+          <div
+            *ngIf="
+              requestForm.get('provider')?.invalid &&
+              requestForm.get('provider')?.touched
+            "
+            class="error-message"
+          >
+            Provider is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="trainingStartDate">Start Date:</label>
+          <input
+            type="date"
+            id="trainingStartDate"
+            formControlName="startDate"
+          />
+          <div
+            *ngIf="
+              requestForm.get('startDate')?.invalid &&
+              requestForm.get('startDate')?.touched
+            "
+            class="error-message"
+          >
+            Start Date is required.
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template ngSwitchCase="it-ticket">
+        <div class="form-group">
+          <label for="issue">Issue:</label>
+          <textarea id="issue" formControlName="issue"></textarea>
+          <div
+            *ngIf="
+              requestForm.get('issue')?.invalid &&
+              requestForm.get('issue')?.touched
+            "
+            class="error-message"
+          >
+            Issue description is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="priority">Priority:</label>
+          <select id="priority" formControlName="priority">
+            <option value="">--Select--</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          <div
+            *ngIf="
+              requestForm.get('priority')?.invalid &&
+              requestForm.get('priority')?.touched
+            "
+            class="error-message"
+          >
+            Priority is required.
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template ngSwitchCase="profile-update">
+        <div class="form-group">
+          <label for="fieldToUpdate">Field to Update:</label>
+          <input
+            type="text"
+            id="fieldToUpdate"
+            formControlName="fieldToUpdate"
+          />
+          <div
+            *ngIf="
+              requestForm.get('fieldToUpdate')?.invalid &&
+              requestForm.get('fieldToUpdate')?.touched
+            "
+            class="error-message"
+          >
+            Field to update is required.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newValue">New Value:</label>
+          <input type="text" id="newValue" formControlName="newValue" />
+          <div
+            *ngIf="
+              requestForm.get('newValue')?.invalid &&
+              requestForm.get('newValue')?.touched
+            "
+            class="error-message"
+          >
+            New value is required.
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template ngSwitchDefault>
+        <p>Please select a request type.</p>
+      </ng-template>
+    </ng-container>
+
+    <button type="submit" [disabled]="requestForm.invalid">
+      Submit Request
+    </button>
+  </form>
+</div>

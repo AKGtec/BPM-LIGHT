@@ -7,7 +7,22 @@ const routes: Routes = [
     path: '',
     canActivate: [RoleGuard],
     data: { roles: ['Admin'] },
-    loadComponent: () => import('./components/admin-placeholder/admin-placeholder.component').then(c => c.AdminPlaceholderComponent)
+    loadComponent: () => import('./components/admin-layout/admin-layout.component').then(c => c.AdminLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'users',
+        pathMatch: 'full'
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./components/user-management/user-management.component').then(c => c.UserManagementComponent)
+      },
+      {
+        path: 'workflow-designer',
+        loadComponent: () => import('./components/workflow-designer/workflow-designer.component').then(c => c.WorkflowDesignerComponent)
+      }
+    ]
   }
 ];
 

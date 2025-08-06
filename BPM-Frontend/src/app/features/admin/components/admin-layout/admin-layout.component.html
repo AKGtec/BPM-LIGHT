@@ -1,0 +1,20 @@
+<div class="admin-layout">
+  <aside class="sidebar">
+    <nav>
+      <ul>
+        <li>
+          <a routerLink="users" routerLinkActive="active">User Management</a>
+        </li>
+        <li>
+          <a routerLink="workflow-designer" routerLinkActive="active"
+            >Workflow Designer</a
+          >
+        </li>
+        <!-- Add more admin navigation links here -->
+      </ul>
+    </nav>
+  </aside>
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

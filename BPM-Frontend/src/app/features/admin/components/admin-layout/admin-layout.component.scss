@@ -1,0 +1,32 @@
+.admin-layout {
+  display: flex;
+  height: 100vh;
+
+  .sidebar {
+    width: 200px;
+    background-color: #f0f0f0;
+    padding: 20px;
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+
+      li a {
+        display: block;
+        padding: 10px 0;
+        text-decoration: none;
+        color: #333;
+
+        &.active {
+          font-weight: bold;
+          color: #007bff;
+        }
+      }
+    }
+  }
+
+  .content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+}

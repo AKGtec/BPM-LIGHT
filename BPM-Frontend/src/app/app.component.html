@@ -1,2 +1,7 @@
 
-<router-outlet></router-outlet>
+<app-main-layout *ngIf="isAuthenticated$ | async; else authContent">
+</app-main-layout>
+
+<ng-template #authContent>
+  <router-outlet></router-outlet>
+</ng-template>

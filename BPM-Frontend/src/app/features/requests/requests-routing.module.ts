@@ -5,6 +5,10 @@ const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./components/requests-placeholder/requests-placeholder.component').then(c => c.RequestsPlaceholderComponent)
+  },
+  {
+    path: 'new/:type',
+    loadComponent: () => import('./components/request-form/request-form.component').then(c => c.RequestFormComponent)
   }
 ];
 

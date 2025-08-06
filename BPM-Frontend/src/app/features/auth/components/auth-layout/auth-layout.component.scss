@@ -1,4 +1,145 @@
-.auth-layout {
-  min-height: 100vh;
+.auth-container {
+  height: 100vh;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-background {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+  }
+}
+
+.auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.auth-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.auth-card-container {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  animation: slideUp 0.6s ease-out;
+}
+
+.brand-section {
+  text-align: center;
+  margin-bottom: 2rem;
+  
+  .brand-logo {
+    margin-bottom: 1rem;
+    
+    .brand-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #667eea;
+    }
+  }
+  
+  .brand-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .brand-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .auth-content {
+    padding: 1rem;
+  }
+  
+  .auth-card-container {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  
+  .brand-section {
+    .brand-title {
+      font-size: 1.75rem;
+    }
+    
+    .brand-subtitle {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card-container {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .brand-section {
+    margin-bottom: 1.5rem;
+    
+    .brand-logo .brand-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+    }
+    
+    .brand-title {
+      font-size: 1.5rem;
+    }
+  }
 }

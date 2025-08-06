@@ -1,0 +1,33 @@
+<div class="notification-list-container">
+  <h2>Notifications</h2>
+
+  <div *ngIf="notifications.length === 0" class="no-notifications">
+    <p>No new notifications.</p>
+  </div>
+
+  <ul *ngIf="notifications.length > 0" class="notification-items">
+    <li
+      *ngFor="let notification of notifications"
+      [class.read]="notification.isRead"
+    >
+      <div class="notification-content">
+        <h4>{{ notification.title }}</h4>
+        <p>{{ notification.message }}</p>
+        <span class="timestamp">{{
+          notification.createdAt | date : "short"
+        }}</span>
+      </div>
+      <button *ngIf="!notification.isRead" (click)="markAsRead(notification)">
+        Mark as Read
+      </button>
+    </li>
+  </ul>
+
+  <button
+    *ngIf="notifications.length > 0"
+    (click)="clearAllNotifications()"
+    class="clear-all-button"
+  >
+    Clear All Notifications
+  </button>
+</div>
