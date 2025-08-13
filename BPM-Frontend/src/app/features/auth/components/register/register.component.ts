@@ -265,14 +265,18 @@ export class RegisterComponent implements OnInit {
         )
         .subscribe({
           next: (response) => {
-            if (response.IsAuthSuccessful) {
+            // Handle both property naming conventions (capital and lowercase)
+            const isAuthSuccessful = response.IsAuthSuccessful ?? response.isAuthSuccessful;
+            const errorMessage = response.ErrorMessage || response.errorMessage;
+
+            if (isAuthSuccessful) {
               this.snackBar.open('Registration successful! Please sign in.', 'Close', {
                 duration: 5000,
                 panelClass: ['success-snackbar']
               });
               this.router.navigate(['/auth/login']);
             } else {
-              this.snackBar.open(response.ErrorMessage || 'Registration failed', 'Close', {
+              this.snackBar.open(errorMessage || 'Registration failed', 'Close', {
                 duration: 5000,
                 panelClass: ['error-snackbar']
               });

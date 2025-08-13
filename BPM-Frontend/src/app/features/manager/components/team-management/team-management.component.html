@@ -1,0 +1,299 @@
+<div class="team-management-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1>
+          <mat-icon>supervisor_account</mat-icon>
+          Team Management
+        </h1>
+        <p>Manage your team members, track performance, and streamline collaboration</p>
+      </div>
+      <div class="header-actions">
+        <button mat-fab color="primary" class="fab-button" (click)="addNewMember()" matTooltip="Add New Member">
+          <mat-icon>person_add</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading your team...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="team-content">
+
+    <!-- Team Overview Metrics -->
+    <div class="metrics-section">
+      <h2 class="section-title">Team Overview</h2>
+      <div class="metrics-grid">
+        <div class="metric-card total-members" matRipple>
+          <div class="metric-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{teamMembers.length}}</div>
+            <div class="metric-label">Total Members</div>
+            <div class="metric-change positive">+2 this month</div>
+          </div>
+        </div>
+
+        <div class="metric-card active-members" matRipple>
+          <div class="metric-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{getActiveMembers()}}</div>
+            <div class="metric-label">Active Members</div>
+            <div class="metric-change positive">{{((getActiveMembers() / teamMembers.length) * 100 | number:'1.0-0')}}% active</div>
+          </div>
+        </div>
+
+        <div class="metric-card performance-rating" matRipple>
+          <div class="metric-icon">
+            <mat-icon>star</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{getAverageRating()}}</div>
+            <div class="metric-label">Avg Performance</div>
+            <div class="metric-change positive">+0.2 from last quarter</div>
+          </div>
+        </div>
+
+        <div class="metric-card on-leave" matRipple>
+          <div class="metric-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{getOnLeaveMembers()}}</div>
+            <div class="metric-label">On Leave</div>
+            <div class="metric-change neutral">Currently away</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <div class="action-card" matRipple (click)="addNewMember()">
+          <div class="action-icon add-member">
+            <mat-icon>person_add</mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>Add New Member</h3>
+            <p>Invite new team members</p>
+          </div>
+        </div>
+
+        <div class="action-card" matRipple (click)="viewAllRequests()">
+          <div class="action-icon view-requests">
+            <mat-icon>assignment</mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>View All Requests</h3>
+            <p>Manage team requests</p>
+          </div>
+        </div>
+
+        <div class="action-card" matRipple (click)="exportTeamData()">
+          <div class="action-icon export-data">
+            <mat-icon>download</mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>Export Data</h3>
+            <p>Download team reports</p>
+          </div>
+        </div>
+
+        <div class="action-card" matRipple (click)="openTeamSettings()">
+          <div class="action-icon team-settings">
+            <mat-icon>tune</mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>Team Settings</h3>
+            <p>Configure team preferences</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team Members Table -->
+    <div class="team-table-section">
+      <div class="table-header">
+        <h2 class="section-title">Team Members</h2>
+        <div class="table-controls">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search members</mat-label>
+            <input matInput [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="Name, email, position...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Department</mat-label>
+            <mat-select [(ngModel)]="departmentFilter" (selectionChange)="applyFilters()">
+              <mat-option value="">All Departments</mat-option>
+              <mat-option *ngFor="let dept of departments" [value]="dept">{{dept}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Status</mat-label>
+            <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilters()">
+              <mat-option value="">All Statuses</mat-option>
+              <mat-option value="Active">Active</mat-option>
+              <mat-option value="Inactive">Inactive</mat-option>
+              <mat-option value="On Leave">On Leave</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="modern-table">
+          <!-- Table Header -->
+          <div class="table-header-row">
+            <div class="table-cell header-cell">Member</div>
+            <div class="table-cell header-cell">Position</div>
+            <div class="table-cell header-cell">Status</div>
+            <div class="table-cell header-cell">Performance</div>
+            <div class="table-cell header-cell">Last Activity</div>
+            <div class="table-cell header-cell actions-cell">Actions</div>
+          </div>
+
+          <!-- Table Rows -->
+          <div *ngFor="let member of filteredTeamMembers; let i = index" class="table-row" matRipple>
+            <div class="table-cell member-cell">
+              <div class="member-info">
+                <div class="member-avatar" [ngClass]="'avatar-' + (i % 4)">
+                  {{member.avatar}}
+                </div>
+                <div class="member-details">
+                  <div class="member-name">{{member.firstName}} {{member.lastName}}</div>
+                  <div class="member-email">{{member.email}}</div>
+                  <div class="member-role">
+                    <mat-chip class="role-chip" [ngClass]="'role-' + member.role?.toLowerCase()">
+                      {{member.role}}
+                    </mat-chip>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell position-cell">
+              <div class="position-info">
+                <div class="position-title">{{member.position}}</div>
+                <div class="department">{{member.department}}</div>
+              </div>
+            </div>
+
+            <div class="table-cell status-cell">
+              <mat-chip [ngClass]="getStatusClass(member.status)">
+                <mat-icon *ngIf="member.status === 'Active'">check_circle</mat-icon>
+                <mat-icon *ngIf="member.status === 'Inactive'">cancel</mat-icon>
+                <mat-icon *ngIf="member.status === 'On Leave'">schedule</mat-icon>
+                {{member.status}}
+              </mat-chip>
+            </div>
+
+            <div class="table-cell performance-cell">
+              <div class="performance-rating" *ngIf="member.performanceRating">
+                <div class="stars-container">
+                  <mat-icon *ngFor="let star of [1,2,3,4,5]" 
+                           [class.filled]="star <= member.performanceRating!">
+                    star
+                  </mat-icon>
+                </div>
+                <span class="rating-text">{{member.performanceRating}}.0</span>
+              </div>
+              <span *ngIf="!member.performanceRating" class="no-rating">Not rated</span>
+            </div>
+
+            <div class="table-cell activity-cell">
+              <div class="activity-info" *ngIf="member.lastActivity">
+                <div class="activity-date">{{member.lastActivity | date:'MMM d'}}</div>
+                <div class="activity-time">{{member.lastActivity | date:'shortTime'}}</div>
+              </div>
+              <span *ngIf="!member.lastActivity" class="no-activity">No activity</span>
+            </div>
+
+            <div class="table-cell actions-cell">
+              <div class="action-buttons">
+                <button mat-icon-button class="action-btn primary" 
+                        (click)="viewMemberDetails(member)" 
+                        matTooltip="View Details">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button class="action-btn secondary" 
+                        (click)="viewMemberRequests(member)" 
+                        matTooltip="View Requests">
+                  <mat-icon>assignment</mat-icon>
+                </button>
+                <button mat-icon-button [matMenuTriggerFor]="memberMenu" 
+                        class="action-btn menu" 
+                        matTooltip="More Actions">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              </div>
+
+              <mat-menu #memberMenu="matMenu" class="member-menu">
+                <button mat-menu-item (click)="assignTask(member)">
+                  <mat-icon>assignment_add</mat-icon>
+                  Assign Task
+                </button>
+                <button mat-menu-item (click)="sendMessage(member)">
+                  <mat-icon>message</mat-icon>
+                  Send Message
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="editMember(member)">
+                  <mat-icon>edit</mat-icon>
+                  Edit Member
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="filteredTeamMembers.length === 0" class="empty-state">
+            <mat-icon>people_outline</mat-icon>
+            <h3>No team members found</h3>
+            <p>Try adjusting your search or filter criteria</p>
+            <button mat-raised-button color="primary" (click)="searchTerm = ''; statusFilter = ''; departmentFilter = ''; applyFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Team Activity</h2>
+        <button mat-button color="primary">View All Activity</button>
+      </div>
+      <div class="activity-container">
+        <div class="activity-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon" [ngClass]="'icon-' + activity.color">
+              <mat-icon>{{activity.icon}}</mat-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{activity.title}}</div>
+              <div class="activity-subtitle">{{activity.subtitle}}</div>
+            </div>
+            <div class="activity-time">{{activity.time}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

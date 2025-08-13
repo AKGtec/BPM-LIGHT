@@ -1,29 +1,313 @@
 <div class="hr-dashboard-container">
-  <h2>HR Dashboard</h2>
-  <p>Welcome, HR! Here you can process, archive, and track requests.</p>
-
-  <h3>Requests for Processing</h3>
-  <!-- Placeholder for a list of requests awaiting HR processing -->
-  <div class="requests-processing-list">
-    <p>No requests currently require HR processing.</p>
-    <!-- In a real application, this would be dynamically populated -->
-    <!--
-    <ul>
-      <li *ngFor="let request of requestsForProcessing">
-        <h4>{{ request.type }} from {{ request.employeeName }}</h4>
-        <p>Status: {{ request.status }}</p>
-        <button>View Details</button>
-        <button>Process</button>
-        <button>Archive</button>
-      </li>
-    </ul>
-    -->
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1>
+          <mat-icon>business_center</mat-icon>
+          HR Dashboard
+        </h1>
+        <p>Manage your team, process requests, and track HR metrics</p>
+      </div>
+      <div class="header-actions">
+        <button mat-fab color="primary" class="fab-button" (click)="generateReport()" matTooltip="Generate Report">
+          <mat-icon>analytics</mat-icon>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <h3>Archived Requests</h3>
-  <!-- Placeholder for a list of archived requests -->
-  <div class="archived-requests-list">
-    <p>No archived requests.</p>
-    <!-- In a real application, this would be dynamically populated -->
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading HR dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!isLoading" class="dashboard-content">
+
+    <!-- Key Metrics Overview -->
+    <div class="metrics-section">
+      <h2 class="section-title">HR Overview</h2>
+      <div class="metrics-grid">
+        <div class="metric-card employees-metric" matRipple>
+          <div class="metric-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{hrMetrics.totalEmployees}}</div>
+            <div class="metric-label">Total Employees</div>
+            <div class="metric-change positive">+3 this month</div>
+          </div>
+        </div>
+
+        <div class="metric-card active-requests" matRipple>
+          <div class="metric-icon">
+            <mat-icon matBadge="{{hrMetrics.pendingApprovals}}" matBadgeColor="warn">assignment</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{hrMetrics.activeRequests}}</div>
+            <div class="metric-label">Active Requests</div>
+            <div class="metric-change neutral">{{hrMetrics.pendingApprovals}} pending approval</div>
+          </div>
+        </div>
+
+        <div class="metric-card processed-metric" matRipple>
+          <div class="metric-icon">
+            <mat-icon>done_all</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{hrMetrics.processedThisMonth}}</div>
+            <div class="metric-label">Processed This Month</div>
+            <div class="metric-change positive">+15% from last month</div>
+          </div>
+        </div>
+
+        <div class="metric-card efficiency-metric" matRipple>
+          <div class="metric-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{hrMetrics.averageProcessingTime}}h</div>
+            <div class="metric-label">Avg Processing Time</div>
+            <div class="metric-change positive">-2h improvement</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Types Breakdown -->
+    <div class="request-types-section">
+      <h2 class="section-title">Request Types</h2>
+      <div class="request-types-grid">
+        <div class="type-card leave-type" matRipple>
+          <div class="type-icon">
+            <mat-icon>event_available</mat-icon>
+          </div>
+          <div class="type-content">
+            <div class="type-value">{{hrMetrics.leaveRequests}}</div>
+            <div class="type-label">Leave Requests</div>
+          </div>
+        </div>
+
+        <div class="type-card expense-type" matRipple>
+          <div class="type-icon">
+            <mat-icon>receipt</mat-icon>
+          </div>
+          <div class="type-content">
+            <div class="type-value">{{hrMetrics.expenseReports}}</div>
+            <div class="type-label">Expense Reports</div>
+          </div>
+        </div>
+
+        <div class="type-card training-type" matRipple>
+          <div class="type-icon">
+            <mat-icon>school</mat-icon>
+          </div>
+          <div class="type-content">
+            <div class="type-value">{{hrMetrics.trainingRequests}}</div>
+            <div class="type-label">Training Requests</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <div *ngFor="let action of quickActions" 
+             class="action-card" 
+             matRipple 
+             (click)="navigateToQuickAction(action)">
+          <div class="action-icon" [ngClass]="'icon-' + action.color">
+            <mat-icon [matBadge]="action.count" 
+                      [matBadgeHidden]="!action.count" 
+                      matBadgeColor="warn">
+              {{action.icon}}
+            </mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>{{action.title}}</h3>
+            <p>{{action.description}}</p>
+          </div>
+          <div class="action-arrow">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content-section">
+      <div class="content-grid">
+        
+        <!-- Pending Requests -->
+        <div class="content-card pending-requests">
+          <div class="card-header">
+            <h3>
+              <mat-icon>assignment</mat-icon>
+              Pending HR Reviews
+            </h3>
+            <button mat-button color="primary" routerLink="/requests">View All</button>
+          </div>
+          <div class="card-content">
+            <div *ngIf="pendingHRRequests.length > 0" class="requests-list">
+              <div *ngFor="let request of pendingHRRequests.slice(0, 5)" class="request-item" matRipple>
+                <div class="request-avatar">
+                  {{getInitials(request.initiatorName)}}
+                </div>
+                <div class="request-info">
+                  <div class="request-title">{{request.title || 'No Title'}}</div>
+                  <div class="request-meta">
+                    <mat-chip [ngClass]="getRequestTypeClass(request.type)" class="type-chip">
+                      {{getRequestTypeLabel(request.type)}}
+                    </mat-chip>
+                    <span class="request-date">{{request.createdAt | date:'MMM d'}}</span>
+                  </div>
+                  <div class="request-employee">{{request.initiatorName}}</div>
+                </div>
+                <div class="request-actions">
+                  <button mat-icon-button color="primary" 
+                          [routerLink]="['/requests/details', request.id]"
+                          matTooltip="View Details">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button mat-icon-button color="accent" 
+                          (click)="processRequest(request)"
+                          matTooltip="Process Request">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="pendingHRRequests.length === 0" class="empty-state">
+              <mat-icon>assignment_turned_in</mat-icon>
+              <h4>All Caught Up!</h4>
+              <p>No requests pending HR review</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Overview -->
+        <div class="content-card team-overview">
+          <div class="card-header">
+            <h3>
+              <mat-icon>people</mat-icon>
+              Team Overview
+            </h3>
+            <button mat-button color="primary" routerLink="/team">Manage Team</button>
+          </div>
+          <div class="card-content">
+            <div class="department-stats">
+              <div *ngFor="let dept of departments" class="department-item">
+                <div class="dept-icon" [style.background-color]="dept.color">
+                  {{getDepartmentInitial(dept.name)}}
+                </div>
+                <div class="dept-info">
+                  <div class="dept-name">{{dept.name}}</div>
+                  <div class="dept-count">{{dept.count}} employees</div>
+                </div>
+                <div class="dept-percentage">{{dept.percentage}}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Hires -->
+        <div class="content-card recent-hires">
+          <div class="card-header">
+            <h3>
+              <mat-icon>person_add</mat-icon>
+              Recent Hires
+            </h3>
+            <button mat-button color="primary">View All</button>
+          </div>
+          <div class="card-content">
+            <div class="hires-list">
+              <div *ngFor="let hire of recentHires; let i = index" class="hire-item">
+                <div class="hire-avatar" [ngClass]="'avatar-' + (i % 4)">
+                  {{hire.avatar}}
+                </div>
+                <div class="hire-info">
+                  <div class="hire-name">{{hire.name}}</div>
+                  <div class="hire-meta">
+                    <span class="hire-department">{{hire.department}}</span>
+                    <span class="hire-date">{{hire.startDate | date:'MMM d'}}</span>
+                  </div>
+                </div>
+                <div class="hire-status">
+                  <mat-chip class="status-new">New</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="content-card recent-activity">
+          <div class="card-header">
+            <h3>
+              <mat-icon>timeline</mat-icon>
+              Recent Activity
+            </h3>
+            <button mat-button color="primary" (click)="viewAllActivity()">View All</button>
+          </div>
+          <div class="card-content">
+            <div class="activity-list">
+              <div *ngFor="let activity of recentActivities" class="activity-item">
+                <div class="activity-icon" [ngClass]="'activity-' + activity.type">
+                  <mat-icon>{{activity.icon}}</mat-icon>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">{{activity.title}}</div>
+                  <div class="activity-subtitle">{{activity.subtitle}}</div>
+                </div>
+                <div class="activity-time">{{activity.time}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HR Analytics -->
+        <div class="content-card hr-analytics">
+          <div class="card-header">
+            <h3>
+              <mat-icon>analytics</mat-icon>
+              HR Analytics
+            </h3>
+            <button mat-button color="primary">View Reports</button>
+          </div>
+          <div class="card-content">
+            <div class="analytics-metrics">
+              <div class="analytics-item">
+                <div class="analytics-label">Daily Processed</div>
+                <div class="analytics-value">{{dailyProcessed}}</div>
+              </div>
+              <div class="analytics-item">
+                <div class="analytics-label">Efficiency Score</div>
+                <div class="analytics-value">{{efficiencyScore}}%</div>
+              </div>
+              <div class="analytics-item">
+                <div class="analytics-label">Response Time</div>
+                <div class="analytics-value">{{hrMetrics.averageProcessingTime}}h</div>
+              </div>
+            </div>
+            
+            <div class="analytics-chart">
+              <div class="chart-placeholder">
+                <mat-icon>trending_up</mat-icon>
+                <p>Performance trends chart</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>

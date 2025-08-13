@@ -1,8 +1,64 @@
 <div class="request-form-container">
-  <h2>Submit {{ requestType | titlecase }} Request</h2>
+  <h2>
+    <span *ngIf="!isEditMode">Submit {{ requestType | titlecase }} Request</span>
+    <span *ngIf="isEditMode">Edit {{ requestType | titlecase }} Request</span>
+  </h2>
 
   <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
-    <ng-container [ngSwitch]="requestType">
+    <!-- Request Type Selection -->
+    <div class="form-group" *ngIf="!isEditMode">
+      <label for="requestType">Request Type:</label>
+      <select id="requestType" formControlName="requestType" (change)="onRequestTypeChange($event)">
+        <option value="">Select Request Type</option>
+        <option [value]="RequestType.Leave">Leave</option>
+        <option [value]="RequestType.Expense">Expense</option>
+        <option [value]="RequestType.Training">Training</option>
+        <option [value]="RequestType.ITSupport">IT Support</option>
+        <option [value]="RequestType.ProfileUpdate">Profile Update</option>
+      </select>
+      <div
+        *ngIf="
+          requestForm.get('requestType')?.invalid &&
+          requestForm.get('requestType')?.touched
+        "
+        class="error-message"
+      >
+        Please select a request type.
+      </div>
+    </div>
+
+    <!-- Common fields for all request types -->
+    <div class="form-group">
+      <label for="title">Request Title:</label>
+      <input type="text" id="title" formControlName="title" placeholder="Enter a descriptive title for your request" />
+      <div
+        *ngIf="
+          requestForm.get('title')?.invalid &&
+          requestForm.get('title')?.touched
+        "
+        class="error-message"
+      >
+        Title is required.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea id="description" formControlName="description" rows="3"
+                placeholder="Provide a detailed description of your request"></textarea>
+      <div
+        *ngIf="
+          requestForm.get('description')?.invalid &&
+          requestForm.get('description')?.touched
+        "
+        class="error-message"
+      >
+        Description is required.
+      </div>
+    </div>
+
+    <!-- Request type specific fields -->
+    <ng-container [ngSwitch]="requestType" *ngIf="requestType || isEditMode">
       <ng-template ngSwitchCase="leave">
         <div class="form-group">
           <label for="startDate">Start Date:</label>
@@ -30,25 +86,12 @@
             End Date is required.
           </div>
         </div>
-        <div class="form-group">
-          <label for="reason">Reason:</label>
-          <textarea id="reason" formControlName="reason"></textarea>
-          <div
-            *ngIf="
-              requestForm.get('reason')?.invalid &&
-              requestForm.get('reason')?.touched
-            "
-            class="error-message"
-          >
-            Reason is required.
-          </div>
-        </div>
       </ng-template>
 
       <ng-template ngSwitchCase="expense">
         <div class="form-group">
           <label for="amount">Amount:</label>
-          <input type="number" id="amount" formControlName="amount" />
+          <input type="number" id="amount" formControlName="amount" step="0.01" min="0" />
           <div
             *ngIf="
               requestForm.get('amount')?.invalid &&
@@ -57,19 +100,6 @@
             class="error-message"
           >
             Amount is required and must be a positive number.
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="description">Description:</label>
-          <textarea id="description" formControlName="description"></textarea>
-          <div
-            *ngIf="
-              requestForm.get('description')?.invalid &&
-              requestForm.get('description')?.touched
-            "
-            class="error-message"
-          >
-            Description is required.
           </div>
         </div>
         <div class="form-group">
@@ -196,8 +226,16 @@
       </ng-template>
     </ng-container>
 
-    <button type="submit" [disabled]="requestForm.invalid">
-      Submit Request
+    <!-- Message when no request type is selected -->
+    <div class="no-type-message" *ngIf="!requestType && !isEditMode">
+      <p>Please select a request type above to continue with your request.</p>
+    </div>
+
+    <button type="submit" [disabled]="requestForm.invalid || isSubmitting" class="submit-button">
+      <span *ngIf="!isSubmitting && !isEditMode">Submit Request</span>
+      <span *ngIf="!isSubmitting && isEditMode">Update Request</span>
+      <span *ngIf="isSubmitting && !isEditMode">Submitting...</span>
+      <span *ngIf="isSubmitting && isEditMode">Updating...</span>
     </button>
   </form>
 </div>

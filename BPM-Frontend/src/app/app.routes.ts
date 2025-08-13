@@ -28,10 +28,33 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'profile',
+    loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/admin/components/system-settings/system-settings.component').then(c => c.SystemSettingsComponent),
+    canActivate: [AuthGuard],
+    data: { roles: ['Admin'] }
+  },
+  {
+    path: 'hr',
+    loadChildren: () => import('./features/hr/hr.module').then(m => m.HRModule),
+    canActivate: [AuthGuard],
+    data: { roles: ['HR', 'Admin'] }
+  },
+  {
     path: 'admin',
     loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule),
     canActivate: [AuthGuard],
     data: { roles: ['Admin'] }
+  },
+  {
+    path: 'manager',
+    loadChildren: () => import('./features/manager/manager.module').then(m => m.ManagerModule),
+    canActivate: [AuthGuard],
+    data: { roles: ['Manager', 'Admin'] }
   },
   {
     path: 'unauthorized',
@@ -39,11 +62,21 @@ export const routes: Routes = [
   },
   {
     path: 'notifications',
-    loadComponent: () => import('./shared/components/notification-list/notification-list.component').then(c => c.NotificationListComponent)
+    loadComponent: () => import('./features/notifications/notifications-page.component').then(c => c.NotificationsPageComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'notifications/test',
+    loadComponent: () => import('./features/notifications/notification-test.component').then(c => c.NotificationTestComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: 'icon-test',
     loadComponent: () => import('./shared/components/icon-test/icon-test.component').then(c => c.IconTestComponent)
+  },
+  {
+    path: 'debug-workflows',
+    loadComponent: () => import('./debug-workflows.component').then(c => c.DebugWorkflowsComponent)
   },
   {
     path: '**',

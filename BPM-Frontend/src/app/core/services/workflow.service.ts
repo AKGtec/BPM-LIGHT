@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { 
-  WorkflowDto, 
-  CreateWorkflowDto, 
+import { map } from 'rxjs/operators';
+import {
+  WorkflowDto,
+  CreateWorkflowDto,
   UpdateWorkflowDto,
   PaginatedResponse,
   PaginationParams
@@ -14,13 +15,13 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class WorkflowService {
-  private readonly API_URL = `${environment.apiUrl}/api/workflow`;
+  private readonly API_URL = `${environment.apiUrl}/api/Workflow`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   getWorkflows(params?: PaginationParams): Observable<PaginatedResponse<WorkflowDto>> {
     let httpParams = new HttpParams();
-    
+
     if (params) {
       if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
       if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
@@ -29,7 +30,17 @@ export class WorkflowService {
       if (params.sortDirection) httpParams = httpParams.set('sortDirection', params.sortDirection);
     }
 
-    return this.http.get<PaginatedResponse<WorkflowDto>>(this.API_URL, { params: httpParams });
+    // The API returns data in camelCase format, convert date strings to Date objects
+    return this.http.get<any>(this.API_URL, { params: httpParams }).pipe(
+      map(response => ({
+        ...response,
+        data: response.data.map((workflow: any) => ({
+          ...workflow,
+          createdAt: new Date(workflow.createdAt),
+          updatedAt: workflow.updatedAt ? new Date(workflow.updatedAt) : undefined
+        }))
+      }))
+    );
   }
 
   getActiveWorkflows(): Observable<WorkflowDto[]> {
@@ -54,6 +65,11 @@ export class WorkflowService {
 
   deleteWorkflow(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`);
+  }
+
+  // Get workflow steps
+  getWorkflowSteps(workflowId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API_URL}/${workflowId}/steps`);
   }
 
   activateWorkflow(id: string): Observable<void> {

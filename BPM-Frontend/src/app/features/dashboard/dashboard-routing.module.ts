@@ -13,6 +13,10 @@ const routes: Routes = [
         loadComponent: () => import('./components/dashboard/dashboard.component').then(c => c.DashboardComponent)
       },
       {
+        path: 'employee',
+        loadComponent: () => import('./components/employee-dashboard/employee-dashboard.component').then(c => c.EmployeeDashboardComponent)
+      },
+      {
         path: 'manager',
         loadComponent: () => import('./components/manager-dashboard/manager-dashboard.component').then(c => c.ManagerDashboardComponent)
       },
@@ -23,6 +27,10 @@ const routes: Routes = [
       {
         path: 'reporting',
         loadComponent: () => import('./components/reporting-dashboard/reporting-dashboard.component').then(c => c.ReportingDashboardComponent)
+      },
+      {
+        path: '**',
+        loadComponent: () => import('./components/dashboard-not-found/dashboard-not-found.component').then(c => c.DashboardNotFoundComponent)
       }
     ]
   }

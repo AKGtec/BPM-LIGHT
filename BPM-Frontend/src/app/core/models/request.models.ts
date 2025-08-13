@@ -66,5 +66,18 @@ export interface RequestSummary {
   pendingRequests: number;
   approvedRequests: number;
   rejectedRequests: number;
-  requestsByType: { [key in RequestType]: number };
+  archivedRequests: number;
+  requestsByType: {
+    leave: number;
+    expense: number;
+    training: number;
+    itSupport: number;
+    profileUpdate: number;
+  };
+  requestsByStatus: {
+    pending: number;
+    approved: number;
+    rejected: number;
+    archived: number;
+  };
 }

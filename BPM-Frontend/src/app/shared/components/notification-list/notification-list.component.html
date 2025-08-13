@@ -1,33 +1,71 @@
 <div class="notification-list-container">
-  <h2>Notifications</h2>
-
-  <div *ngIf="notifications.length === 0" class="no-notifications">
-    <p>No new notifications.</p>
+  <div class="notification-header">
+    <h2>Notifications</h2>
+    <div class="header-actions" *ngIf="notifications.length > 0">
+      <button mat-button (click)="refreshNotifications()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <button mat-button (click)="markAllAsRead()" *ngIf="notifications.some(n => !n.isRead)">
+        <mat-icon>done_all</mat-icon>
+        Mark All Read
+      </button>
+    </div>
   </div>
 
-  <ul *ngIf="notifications.length > 0" class="notification-items">
-    <li
-      *ngFor="let notification of notifications"
-      [class.read]="notification.isRead"
-    >
-      <div class="notification-content">
-        <h4>{{ notification.title }}</h4>
-        <p>{{ notification.message }}</p>
-        <span class="timestamp">{{
-          notification.createdAt | date : "short"
-        }}</span>
-      </div>
-      <button *ngIf="!notification.isRead" (click)="markAsRead(notification)">
-        Mark as Read
-      </button>
-    </li>
-  </ul>
+  <div *ngIf="notifications.length === 0" class="no-notifications">
+    <mat-icon>notifications_none</mat-icon>
+    <p>No notifications found.</p>
+    <button mat-button (click)="refreshNotifications()">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
 
-  <button
-    *ngIf="notifications.length > 0"
-    (click)="clearAllNotifications()"
-    class="clear-all-button"
-  >
-    Clear All Notifications
-  </button>
+  <mat-list *ngIf="notifications.length > 0" class="notification-items">
+    <mat-list-item
+      *ngFor="let notification of notifications; trackBy: trackByNotificationId"
+      [class.unread]="!notification.isRead"
+      class="notification-item"
+    >
+      <mat-icon matListItemIcon [color]="getNotificationColor(notification.type)">
+        {{ getNotificationIcon(notification.type) }}
+      </mat-icon>
+      
+      <div matListItemTitle>{{ notification.title }}</div>
+      <div matListItemLine>{{ notification.message }}</div>
+      <div matListItemLine class="notification-meta">
+        <span class="timestamp">{{ notification.createdAt | date : "short" }}</span>
+        <span class="notification-type">{{ getNotificationTypeLabel(notification.type) }}</span>
+      </div>
+
+      <div class="notification-actions">
+        <button 
+          mat-icon-button 
+          *ngIf="!notification.isRead" 
+          (click)="markAsRead(notification)"
+          matTooltip="Mark as read">
+          <mat-icon>done</mat-icon>
+        </button>
+        <button 
+          mat-icon-button 
+          (click)="deleteNotification(notification)"
+          matTooltip="Delete notification">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-list-item>
+  </mat-list>
+
+  <div class="notification-footer" *ngIf="notifications.length > 0">
+    <button
+      mat-stroked-button
+      color="warn"
+      (click)="clearAllNotifications()"
+      class="clear-all-button"
+    >
+      <mat-icon>clear_all</mat-icon>
+      Clear All Notifications
+    </button>
+  </div>
 </div>

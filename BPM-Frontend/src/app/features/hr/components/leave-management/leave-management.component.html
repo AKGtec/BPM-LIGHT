@@ -1,0 +1,288 @@
+<div class="leave-management-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1>
+          <mat-icon>event_available</mat-icon>
+          Leave Management
+        </h1>
+        <p>Manage and process employee leave requests efficiently</p>
+      </div>
+      <div class="header-actions">
+        <button mat-fab color="primary" class="fab-button" (click)="exportToExcel()" matTooltip="Export Data">
+          <mat-icon>download</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading leave requests...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="leave-content">
+
+    <!-- Statistics Overview -->
+    <div class="statistics-section">
+      <h2 class="section-title">Leave Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-card pending-stat" matRipple>
+          <div class="stat-icon">
+            <mat-icon>pending</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{getPendingRequests()}}</div>
+            <div class="stat-label">Pending Requests</div>
+            <div class="stat-change neutral">Requires attention</div>
+          </div>
+        </div>
+
+        <div class="stat-card approved-stat" matRipple>
+          <div class="stat-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{getApprovedRequests()}}</div>
+            <div class="stat-label">Approved This Month</div>
+            <div class="stat-change positive">+12% from last month</div>
+          </div>
+        </div>
+
+        <div class="stat-card rejected-stat" matRipple>
+          <div class="stat-icon">
+            <mat-icon>cancel</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{getRejectedRequests()}}</div>
+            <div class="stat-label">Rejected Requests</div>
+            <div class="stat-change neutral">Review required</div>
+          </div>
+        </div>
+
+        <div class="stat-card total-stat" matRipple>
+          <div class="stat-icon">
+            <mat-icon>calendar_today</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{getTotalRequests()}}</div>
+            <div class="stat-label">Total Requests</div>
+            <div class="stat-change positive">All time</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <div *ngFor="let action of quickActions" 
+             class="action-card" 
+             matRipple 
+             (click)="action.action()">
+          <div class="action-icon" [ngClass]="'icon-' + action.color">
+            <mat-icon [matBadge]="action.count" 
+                      [matBadgeHidden]="!action.count" 
+                      matBadgeColor="warn">
+              {{action.icon}}
+            </mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>{{action.title}}</h3>
+            <p>{{action.description}}</p>
+          </div>
+          <div class="action-arrow">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters and Controls -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <h2 class="section-title">Leave Requests</h2>
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" (click)="bulkApprove()" 
+                  [disabled]="getPendingRequests() === 0">
+            <mat-icon>done_all</mat-icon>
+            Bulk Approve
+          </button>
+          <button mat-stroked-button (click)="clearFilters()">
+            <mat-icon>clear</mat-icon>
+            Clear Filters
+          </button>
+        </div>
+      </div>
+      
+      <div class="filters-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search requests</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (input)="applyFilters()" 
+                 placeholder="Employee name, title, description...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
+            <mat-option value="">All Statuses</mat-option>
+            <mat-option value="Pending">Pending</mat-option>
+            <mat-option value="Approved">Approved</mat-option>
+            <mat-option value="Rejected">Rejected</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Priority</mat-label>
+          <mat-select [(ngModel)]="selectedPriority" (selectionChange)="applyFilters()">
+            <mat-option value="">All Priorities</mat-option>
+            <mat-option value="Low">Low</mat-option>
+            <mat-option value="Medium">Medium</mat-option>
+            <mat-option value="High">High</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Requests Table -->
+    <div class="requests-section">
+      <div class="table-container">
+        <div class="modern-table">
+          <!-- Table Header -->
+          <div class="table-header-row">
+            <div class="table-cell header-cell">Employee</div>
+            <div class="table-cell header-cell">Request Details</div>
+            <div class="table-cell header-cell">Status & Priority</div>
+            <div class="table-cell header-cell">Workflow</div>
+            <div class="table-cell header-cell">Created</div>
+            <div class="table-cell header-cell actions-cell">Actions</div>
+          </div>
+
+          <!-- Table Rows -->
+          <div *ngFor="let request of filteredRequests; let i = index" class="table-row" matRipple>
+            <div class="table-cell employee-cell">
+              <div class="employee-info">
+                <div class="employee-avatar" [ngClass]="'avatar-' + (i % 4)">
+                  {{getInitials(request.initiatorName)}}
+                </div>
+                <div class="employee-details">
+                  <div class="employee-name">{{request.initiatorName}}</div>
+                  <div class="employee-meta">{{request.duration}}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell request-cell">
+              <div class="request-info">
+                <div class="request-title">{{request.title}}</div>
+                <div class="request-description">{{request.description}}</div>
+              </div>
+            </div>
+
+            <div class="table-cell status-cell">
+              <div class="status-priority-info">
+                <mat-chip [ngClass]="getStatusClass(request.status)" class="status-chip">
+                  <mat-icon *ngIf="request.status === 'Pending'">schedule</mat-icon>
+                  <mat-icon *ngIf="request.status === 'Approved'">check_circle</mat-icon>
+                  <mat-icon *ngIf="request.status === 'Rejected'">cancel</mat-icon>
+                  {{request.status}}
+                </mat-chip>
+                <mat-chip [ngClass]="getPriorityClass(request.priority!)" class="priority-chip">
+                  {{request.priority}}
+                </mat-chip>
+              </div>
+            </div>
+
+            <div class="table-cell workflow-cell">
+              <div class="workflow-info">
+                <div class="current-step">{{request.currentStep}}</div>
+                <div class="workflow-indicator" *ngIf="request.hasWorkflowSteps">
+                  <mat-icon>timeline</mat-icon>
+                  <span>Has workflow</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell date-cell">
+              <div class="date-info">
+                <div class="date-value">{{request.createdAt | date:'MMM d'}}</div>
+                <div class="time-value">{{request.createdAt | date:'shortTime'}}</div>
+              </div>
+            </div>
+
+            <div class="table-cell actions-cell">
+              <div class="action-buttons">
+                <button mat-icon-button class="action-btn primary" 
+                        (click)="viewRequest(request)" 
+                        matTooltip="View Details">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                
+                <button mat-icon-button class="action-btn success" 
+                        *ngIf="request.status === 'Pending'" 
+                        (click)="approveRequest(request)" 
+                        matTooltip="Approve Request">
+                  <mat-icon>check</mat-icon>
+                </button>
+                
+                <button mat-icon-button class="action-btn danger" 
+                        *ngIf="request.status === 'Pending'" 
+                        (click)="rejectRequest(request)" 
+                        matTooltip="Reject Request">
+                  <mat-icon>close</mat-icon>
+                </button>
+                
+                <button mat-icon-button class="action-btn secondary" 
+                        *ngIf="request.hasWorkflowSteps" 
+                        (click)="viewWorkflowSteps(request)" 
+                        matTooltip="View Workflow">
+                  <mat-icon>timeline</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="filteredRequests.length === 0" class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <h3>No leave requests found</h3>
+            <p>Try adjusting your search or filter criteria</p>
+            <button mat-raised-button color="primary" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Activity</h2>
+        <button mat-button color="primary">View All Activity</button>
+      </div>
+      <div class="activity-container">
+        <div class="activity-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon" [ngClass]="'activity-' + activity.type">
+              <mat-icon>{{activity.icon}}</mat-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{activity.title}}</div>
+              <div class="activity-subtitle">{{activity.subtitle}}</div>
+            </div>
+            <div class="activity-time">{{activity.time}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

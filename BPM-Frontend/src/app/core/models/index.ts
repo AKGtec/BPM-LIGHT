@@ -28,12 +28,25 @@ export interface PaginatedResponse<T> {
   hasNextPage: boolean;
 }
 
+// API Response format (PascalCase)
+export interface ApiPaginatedResponse<T> {
+  Data: T[];
+  TotalCount: number;
+  PageNumber: number;
+  PageSize: number;
+  TotalPages: number;
+  HasPreviousPage: boolean;
+  HasNextPage: boolean;
+}
+
 export interface PaginationParams {
   pageNumber: number;
   pageSize: number;
   searchTerm?: string;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
+  status?: number;
+  type?: number;
 }
 
 export interface SelectOption {

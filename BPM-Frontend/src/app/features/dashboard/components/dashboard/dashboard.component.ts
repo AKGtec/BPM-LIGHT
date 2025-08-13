@@ -238,6 +238,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadUserData();
     this.loadDashboardStats();
     this.loadRecentActivity();
+
+    // Automatically redirect to role-specific dashboard
+    this.redirectToRoleDashboard();
+  }
+
+  private redirectToRoleDashboard(): void {
+    const dashboardRoute = this.authService.getDashboardRoute();
+    // Only redirect if we're not already on the specific dashboard
+    if (this.router.url === '/dashboard' || this.router.url === '/dashboard/') {
+      this.router.navigate([dashboardRoute]);
+    }
   }
 
   ngOnDestroy(): void {

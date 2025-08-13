@@ -65,7 +65,7 @@ interface NavigationItem {
               <mat-icon>account_circle</mat-icon>
             </div>
             <div class="user-details">
-              <div class="user-name">{{user.firstName}} {{user.lastName}}</div>
+              <div class="user-name">{{(user.FirstName || user.firstName)}} {{(user.LastName || user.lastName)}}</div>
               <div class="user-role">{{getUserRoles(user)}}</div>
             </div>
           </div>
@@ -203,27 +203,54 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean>;
 
   navigationItems: NavigationItem[] = [
+    // === COMMON ITEMS ===
     {
       label: 'Dashboard',
       icon: 'dashboard',
       route: '/dashboard'
     },
+
+    // === EMPLOYEE-SPECIFIC ITEMS ===
     {
       label: 'My Requests',
       icon: 'assignment',
-      route: '/requests'
+      route: '/requests',
+      roles: ['Employee']
     },
     {
       label: 'New Request',
       icon: 'add_circle',
-      route: '/requests/new'
+      route: '/requests/new',
+      roles: ['Employee']
     },
     {
-      label: 'Manager Dashboard',
+      label: 'Employee Dashboard',
+      icon: 'person',
+      route: '/dashboard/employee',
+      roles: ['Employee']
+    },
+
+    // === MANAGER-SPECIFIC ITEMS ===
+    {
+      label: 'Team Management',
       icon: 'supervisor_account',
-      route: '/dashboard/manager',
+      route: '/manager/team-management',
       roles: ['Manager', 'Admin']
     },
+    {
+      label: 'Pending Approvals',
+      icon: 'approval',
+      route: '/requests/approval',
+      roles: ['Manager', 'HR', 'Admin']
+    },
+    {
+      label: 'Team Reports',
+      icon: 'analytics',
+      route: '/manager/team-reports',
+      roles: ['Manager']
+    },
+
+    // === HR-SPECIFIC ITEMS ===
     {
       label: 'HR Dashboard',
       icon: 'people',
@@ -231,15 +258,35 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       roles: ['HR', 'Admin']
     },
     {
-      label: 'Reports',
-      icon: 'analytics',
-      route: '/dashboard/reports',
-      roles: ['Manager', 'HR', 'Admin']
+      label: 'Employee Management',
+      icon: 'badge',
+      route: '/hr/employees',
+      roles: ['HR', 'Admin']
     },
     {
-      label: 'Workflows',
-      icon: 'account_tree',
-      route: '/workflows',
+      label: 'Leave Management',
+      icon: 'event_available',
+      route: '/hr/leave-management',
+      roles: ['HR', 'Admin']
+    },
+    {
+      label: 'Performance Reviews',
+      icon: 'star_rate',
+      route: '/hr/performance-reviews',
+      roles: ['HR', 'Admin']
+    },
+    {
+      label: 'HR Reports',
+      icon: 'assessment',
+      route: '/hr/reports',
+      roles: ['HR', 'Admin']
+    },
+
+    // === ADMIN-SPECIFIC ITEMS ===
+    {
+      label: 'System Analytics',
+      icon: 'analytics',
+      route: '/dashboard/reporting',
       roles: ['Admin']
     },
     {
@@ -249,19 +296,44 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       roles: ['Admin']
     },
     {
+      label: 'Workflow Designer',
+      icon: 'account_tree',
+      route: '/admin/workflow-designer',
+      roles: ['Admin']
+    },
+    {
+      label: 'Role Management',
+      icon: 'admin_panel_settings',
+      route: '/admin/roles',
+      roles: ['Admin']
+    },
+    {
       label: 'System Settings',
       icon: 'settings',
-      route: '/admin/settings',
+      route: '/settings',
       roles: ['Admin']
+    },
+    {
+      label: 'Admin Reports',
+      icon: 'bar_chart',
+      route: '/admin/reports',
+      roles: ['Admin']
+    },
+
+    // === COMMON ITEMS (BOTTOM) ===
+    {
+      label: 'My Profile',
+      icon: 'account_circle',
+      route: '/profile'
     }
   ];
 
   constructor(
-    private breakpointObserver: BreakpointObserver,
-    private authService: AuthService,
-    private notificationService: NotificationService,
-    private signalRService: SignalRService,
-    private router: Router
+    private readonly  breakpointObserver: BreakpointObserver,
+    private readonly authService: AuthService,
+    private readonly notificationService: NotificationService,
+    private readonly signalRService: SignalRService,
+    private readonly router: Router
   ) {
     this.currentUser$ = this.authService.currentUser$;
     this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -282,11 +354,17 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   }
 
   private loadNotifications(): void {
-    this.notificationService.getNotifications({ pageNumber: 1, pageSize: 5 })
+    // Subscribe to the notification service observables for real-time updates
+    this.notificationService.notifications$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(response => {
-        this.recentNotifications = response.data;
-        this.unreadNotificationCount = response.data.filter(n => !n.isRead).length;
+      .subscribe(notifications => {
+        this.recentNotifications = notifications.slice(0, 5); // Show only recent 5
+      });
+
+    this.notificationService.unreadCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(count => {
+        this.unreadNotificationCount = count;
       });
   }
 
@@ -308,13 +386,47 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   hasAccess(roles?: string[]): boolean {
     if (!roles || roles.length === 0) {
-      return true;
+      return true; // No role restriction, show to everyone
     }
+
+    // Get current user roles
+    const currentUser = this.authService.getCurrentUser();
+    const userRoles = currentUser?.Roles || currentUser?.roles || [];
+
+    // Role hierarchy and exclusion logic
+    const hasAdminRole = userRoles.includes('Admin');
+    const hasHRRole = userRoles.includes('HR');
+    const hasManagerRole = userRoles.includes('Manager');
+    const hasEmployeeRole = userRoles.includes('Employee');
+
+    // Employee-only items: Only show if user ONLY has Employee role
+    if (roles.includes('Employee') && roles.length === 1) {
+      return hasEmployeeRole && !hasManagerRole && !hasHRRole && !hasAdminRole;
+    }
+
+    // Manager-only items: Only show if user has Manager role but not HR/Admin
+    if (roles.includes('Manager') && roles.length === 1) {
+      return hasManagerRole && !hasHRRole && !hasAdminRole;
+    }
+
+    // HR-only items: Only show if user has HR role but not Admin
+    if (roles.includes('HR') && roles.length === 1) {
+      return hasHRRole && !hasAdminRole;
+    }
+
+    // Admin-only items: Only show if user has Admin role
+    if (roles.includes('Admin') && roles.length === 1) {
+      return hasAdminRole;
+    }
+
+    // Multi-role items: Use standard role check
     return this.authService.hasAnyRole(roles);
   }
 
   getUserRoles(user: UserDto): string {
-    return user.roles?.join(', ') || 'User';
+    // Handle both property naming conventions (capital and lowercase)
+    const roles = user.Roles || user.roles || [];
+    return roles.join(', ') || 'User';
   }
 
   getPageTitle(): string {
@@ -325,11 +437,24 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       '/requests/new': 'New Request',
       '/dashboard/manager': 'Manager Dashboard',
       '/dashboard/hr': 'HR Dashboard',
+      '/dashboard/employee': 'Employee Dashboard',
       '/dashboard/reports': 'Reports',
+      '/dashboard/reporting': 'System Analytics',
       '/workflows': 'Workflow Management',
+      '/hr/dashboard': 'HR Dashboard',
+      '/hr/employees': 'Employee Management',
+      '/hr/leave-management': 'Leave Management',
+      '/hr/performance-reviews': 'Performance Reviews',
+      '/hr/reports': 'HR Reports',
+      '/hr/policies': 'Policy Management',
       '/admin/users': 'User Management',
+      '/admin/workflow-designer': 'Workflow Designer',
+      '/admin/roles': 'Role Management',
       '/admin/settings': 'System Settings',
-      '/notifications': 'Notifications'
+      '/admin/reports': 'Admin Reports',
+      '/settings': 'System Settings',
+      '/notifications': 'Notifications',
+      '/profile': 'My Profile'
     };
     
     return titleMap[url] || 'BPM Light';

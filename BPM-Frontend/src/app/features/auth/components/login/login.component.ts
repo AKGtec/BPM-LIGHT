@@ -145,14 +145,28 @@ export class LoginComponent implements OnInit {
         )
         .subscribe({
           next: (response) => {
-            if (response.IsAuthSuccessful) {
+            console.log('Login response:', response);
+
+            // Handle both property naming conventions (capital and lowercase)
+            const isAuthSuccessful = response.IsAuthSuccessful ?? response.isAuthSuccessful;
+            const errorMessage = response.ErrorMessage || response.errorMessage;
+
+            console.log('isAuthSuccessful:', isAuthSuccessful);
+            console.log('Response type:', typeof isAuthSuccessful);
+            console.log('ErrorMessage:', errorMessage);
+
+            if (isAuthSuccessful) {
               this.snackBar.open('Login successful!', 'Close', {
                 duration: 3000,
                 panelClass: ['success-snackbar']
               });
-              this.router.navigate(['/dashboard']);
+
+              // Get the appropriate dashboard route based on user role
+              const dashboardRoute = this.authService.getDashboardRoute();
+              this.router.navigate([dashboardRoute]);
             } else {
-              this.snackBar.open(response.ErrorMessage || 'Login failed', 'Close', {
+              console.log('Login failed. Error message:', errorMessage);
+              this.snackBar.open(errorMessage || 'Login failed', 'Close', {
                 duration: 5000,
                 panelClass: ['error-snackbar']
               });

@@ -1,1 +1,258 @@
-<p>workflow-designer works!</p>
+<div class="workflow-designer-container">
+  <div class="header-section">
+    <h1>
+      <mat-icon>account_tree</mat-icon>
+      Workflow Designer
+    </h1>
+    <p>Design and manage business process workflows</p>
+
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="createWorkflow()">
+        <mat-icon>add</mat-icon>
+        Create Workflow
+      </button>
+    </div>
+  </div>
+
+  <div class="content-layout">
+    <!-- Workflows List -->
+    <div class="workflows-panel">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Existing Workflows</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div *ngIf="loading" class="loading-container">
+            <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+            <p>Loading workflows...</p>
+          </div>
+
+          <div *ngIf="!loading" class="workflows-table">
+            <table mat-table [dataSource]="workflows" class="workflows-table">
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let workflow">
+                  <div class="workflow-name">
+                    <strong>{{workflow.name}}</strong>
+                    <small>{{workflow.description}}</small>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Request Type Column -->
+              <ng-container matColumnDef="requestType">
+                <th mat-header-cell *matHeaderCellDef>Request Type</th>
+                <td mat-cell *matCellDef="let workflow">
+                  <mat-chip>{{getRequestTypeLabel(workflow.requestType)}}</mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Steps Column -->
+              <ng-container matColumnDef="steps">
+                <th mat-header-cell *matHeaderCellDef>Steps</th>
+                <td mat-cell *matCellDef="let workflow">
+                  <span class="steps-count">{{workflow.steps.length}} steps</span>
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let workflow">
+                  <mat-chip [class]="workflow.isActive ? 'status-active' : 'status-inactive'">
+                    {{workflow.isActive ? 'Active' : 'Inactive'}}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let workflow">
+                  <div class="action-buttons">
+                    <button mat-icon-button (click)="editWorkflow(workflow)" matTooltip="Edit Workflow">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="toggleWorkflowStatus(workflow)"
+                            [matTooltip]="workflow.isActive ? 'Deactivate' : 'Activate'">
+                      <mat-icon>{{workflow.isActive ? 'pause' : 'play_arrow'}}</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteWorkflow(workflow)" matTooltip="Delete Workflow">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                  [class.selected-row]="selectedWorkflow?.id === row.id"
+                  (click)="editWorkflow(row)"></tr>
+            </table>
+          </div>
+
+          <div *ngIf="!loading && workflows.length === 0" class="no-workflows">
+            <mat-icon>account_tree</mat-icon>
+            <h3>No Workflows Found</h3>
+            <p>Create your first workflow to get started.</p>
+            <button mat-raised-button color="primary" (click)="createWorkflow()">
+              <mat-icon>add</mat-icon>
+              Create Workflow
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Workflow Editor -->
+    <div class="editor-panel" *ngIf="selectedWorkflow !== null || workflowForm.dirty">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            {{selectedWorkflow ? 'Edit Workflow' : 'Create New Workflow'}}
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <mat-tab-group>
+            <!-- Basic Information Tab -->
+            <mat-tab label="Basic Information">
+              <div class="tab-content">
+                <form [formGroup]="workflowForm" (ngSubmit)="saveWorkflow()">
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Workflow Name</mat-label>
+                      <input matInput formControlName="name" placeholder="Enter workflow name">
+                      <mat-error *ngIf="workflowForm.get('name')?.hasError('required')">
+                        Workflow name is required
+                      </mat-error>
+                      <mat-error *ngIf="workflowForm.get('name')?.hasError('minlength')">
+                        Workflow name must be at least 3 characters
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Description</mat-label>
+                      <textarea matInput formControlName="description" rows="3"
+                                placeholder="Describe the purpose of this workflow"></textarea>
+                      <mat-error *ngIf="workflowForm.get('description')?.hasError('required')">
+                        Description is required
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Request Type</mat-label>
+                      <mat-select formControlName="requestType">
+                        <mat-option *ngFor="let type of requestTypes" [value]="type.value">
+                          {{type.label}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="workflowForm.get('requestType')?.hasError('required')">
+                        Request type is required
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-actions">
+                    <button mat-raised-button color="primary" type="submit" [disabled]="!workflowForm.valid">
+                      <mat-icon>save</mat-icon>
+                      {{selectedWorkflow ? 'Update' : 'Create'}} Workflow
+                    </button>
+                    <button mat-button type="button" (click)="selectedWorkflow = null; workflowForm.reset()">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </mat-tab>
+
+            <!-- Workflow Steps Tab -->
+            <mat-tab label="Workflow Steps" [disabled]="!selectedWorkflow">
+              <div class="tab-content">
+                <div class="steps-section">
+                  <h3>Workflow Steps</h3>
+
+                  <!-- Add Step Form -->
+                  <div class="add-step-form">
+                    <form [formGroup]="stepForm" (ngSubmit)="addStep()">
+                      <div class="form-row">
+                        <mat-form-field appearance="outline">
+                          <mat-label>Step Name</mat-label>
+                          <input matInput formControlName="name" placeholder="Enter step name">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Step Type</mat-label>
+                          <mat-select formControlName="type">
+                            <mat-option *ngFor="let type of stepTypes" [value]="type.value">
+                              {{type.label}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Assigned Role</mat-label>
+                          <mat-select formControlName="assignedRole">
+                            <mat-option *ngFor="let role of availableRoles" [value]="role.value">
+                              {{role.label}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                          <mat-label>Order</mat-label>
+                          <input matInput type="number" formControlName="order" min="1">
+                        </mat-form-field>
+
+                        <button mat-raised-button color="primary" type="submit" [disabled]="!stepForm.valid">
+                          <mat-icon>add</mat-icon>
+                          Add Step
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- Steps List -->
+                  <div class="steps-list" *ngIf="selectedWorkflow && selectedWorkflow.steps && selectedWorkflow.steps.length > 0">
+                    <div class="step-item" *ngFor="let step of selectedWorkflow.steps; trackBy: trackByStepId">
+                      <div class="step-info">
+                        <div class="step-header">
+                          <span class="step-order">{{step.order}}</span>
+                          <h4>{{step.name}}</h4>
+                          <mat-chip class="step-type">{{getStepTypeLabel(step.type)}}</mat-chip>
+                        </div>
+                        <div class="step-details">
+                          <span class="assigned-role">
+                            <mat-icon>person</mat-icon>
+                            {{getRoleLabel(step.assignedRole)}}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="step-actions">
+                        <button mat-icon-button color="warn" (click)="removeStep(step)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="no-steps" *ngIf="selectedWorkflow && (!selectedWorkflow.steps || selectedWorkflow.steps.length === 0)">
+                    <mat-icon>timeline</mat-icon>
+                    <h3>No Steps Defined</h3>
+                    <p>Add steps to define the workflow process.</p>
+                  </div>
+                </div>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

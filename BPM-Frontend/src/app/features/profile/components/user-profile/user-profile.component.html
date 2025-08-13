@@ -1,0 +1,369 @@
+<div class="profile-container">
+  <!-- Header Section -->
+  <div class="profile-header">
+    <div class="header-content">
+      <div class="user-avatar">
+        {{getInitials()}}
+      </div>
+      <div class="header-info">
+        <h1>{{currentUser?.firstName}} {{currentUser?.lastName}}</h1>
+        <p class="user-email">{{currentUser?.email}}</p>
+        <div class="user-roles">
+          <mat-chip-set>
+            <mat-chip *ngFor="let role of currentUser?.roles || []" [color]="getRoleColor(role)">
+              {{role}}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading your profile...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="profile-content">
+
+    <!-- Profile Overview -->
+    <div class="overview-section">
+      <h2 class="section-title">Profile Overview</h2>
+      <div class="overview-grid">
+        <div class="overview-card completion-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{profileStats.profileCompletion}}%</div>
+            <div class="overview-label">Profile Complete</div>
+            <div class="overview-progress">
+              <div class="progress-bar" [style.width.%]="profileStats.profileCompletion"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overview-card login-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{profileStats.lastLogin | date:'MMM d'}}</div>
+            <div class="overview-label">Last Login</div>
+            <div class="overview-change">{{profileStats.lastLogin | date:'shortTime'}}</div>
+          </div>
+        </div>
+
+        <div class="overview-card age-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>event</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{profileStats.accountAge}}</div>
+            <div class="overview-label">Days Active</div>
+            <div class="overview-change">Member since</div>
+          </div>
+        </div>
+
+        <div class="overview-card security-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon matBadge="{{profileStats.securityScore}}" matBadgeColor="accent">security</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{profileStats.securityScore}}/100</div>
+            <div class="overview-label">Security Score</div>
+            <div class="overview-change positive">Excellent</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <div *ngFor="let action of quickActions" 
+             class="action-card" 
+             matRipple 
+             (click)="action.action()">
+          <div class="action-icon" [ngClass]="'icon-' + action.color">
+            <mat-icon>{{action.icon}}</mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>{{action.title}}</h3>
+            <p>{{action.description}}</p>
+          </div>
+          <div class="action-arrow">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Management Tabs -->
+    <div class="profile-tabs-section">
+      <mat-tab-group animationDuration="300ms" class="modern-tabs">
+        
+        <!-- Personal Information Tab -->
+        <mat-tab label="Personal Information">
+          <div class="tab-content">
+            <div class="form-container">
+              <div class="form-header">
+                <h3>Personal Details</h3>
+                <p>Update your personal information and contact details</p>
+              </div>
+              
+              <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
+                <div class="form-grid">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>First Name</mat-label>
+                    <input matInput formControlName="firstName" placeholder="Enter your first name">
+                    <mat-icon matSuffix>person</mat-icon>
+                    <mat-error *ngIf="profileForm.get('firstName')?.hasError('required')">
+                      First name is required
+                    </mat-error>
+                    <mat-error *ngIf="profileForm.get('firstName')?.hasError('minlength')">
+                      First name must be at least 2 characters
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput formControlName="lastName" placeholder="Enter your last name">
+                    <mat-icon matSuffix>person</mat-icon>
+                    <mat-error *ngIf="profileForm.get('lastName')?.hasError('required')">
+                      Last name is required
+                    </mat-error>
+                    <mat-error *ngIf="profileForm.get('lastName')?.hasError('minlength')">
+                      Last name must be at least 2 characters
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="userName" placeholder="Enter your username">
+                    <mat-icon matSuffix>account_circle</mat-icon>
+                    <mat-error *ngIf="profileForm.get('userName')?.hasError('required')">
+                      Username is required
+                    </mat-error>
+                    <mat-error *ngIf="profileForm.get('userName')?.hasError('minlength')">
+                      Username must be at least 3 characters
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Email Address</mat-label>
+                    <input matInput type="email" formControlName="email" placeholder="Enter your email">
+                    <mat-icon matSuffix>email</mat-icon>
+                    <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+                      Email is required
+                    </mat-error>
+                    <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+                      Please enter a valid email address
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field full-width">
+                    <mat-label>Phone Number</mat-label>
+                    <input matInput formControlName="phoneNumber" placeholder="Enter your phone number">
+                    <mat-icon matSuffix>phone</mat-icon>
+                    <mat-error *ngIf="profileForm.get('phoneNumber')?.hasError('pattern')">
+                      Please enter a valid phone number
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" type="submit" 
+                          [disabled]="profileForm.invalid || isUpdating"
+                          class="action-button">
+                    <mat-spinner *ngIf="isUpdating" diameter="20"></mat-spinner>
+                    <mat-icon *ngIf="!isUpdating">save</mat-icon>
+                    <span *ngIf="!isUpdating">Update Profile</span>
+                    <span *ngIf="isUpdating">Updating...</span>
+                  </button>
+                  <button mat-stroked-button type="button" (click)="resetForm()" class="action-button">
+                    <mat-icon>refresh</mat-icon>
+                    Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Change Password Tab -->
+        <mat-tab label="Security">
+          <div class="tab-content">
+            <div class="form-container">
+              <div class="form-header">
+                <h3>Change Password</h3>
+                <p>Update your account password for better security</p>
+              </div>
+              
+              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
+                <div class="form-grid">
+                  <mat-form-field appearance="outline" class="form-field full-width">
+                    <mat-label>Current Password</mat-label>
+                    <input matInput type="password" formControlName="currentPassword" 
+                           placeholder="Enter your current password">
+                    <mat-icon matSuffix>lock</mat-icon>
+                    <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
+                      Current password is required
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field full-width">
+                    <mat-label>New Password</mat-label>
+                    <input matInput type="password" formControlName="newPassword" 
+                           placeholder="Enter your new password">
+                    <mat-icon matSuffix>lock_open</mat-icon>
+                    <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+                      New password is required
+                    </mat-error>
+                    <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+                      Password must be at least 8 characters
+                    </mat-error>
+                    <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('passwordStrength')">
+                      Password must contain uppercase, lowercase, number, and special character
+                    </mat-error>
+                  </mat-form-field>
+
+                  <!-- Password Strength Indicator -->
+                  <div *ngIf="passwordForm.get('newPassword')?.value" class="password-strength full-width">
+                    <div class="strength-label">Password Strength: {{getPasswordStrengthLabel()}}</div>
+                    <div class="strength-bar">
+                      <div class="strength-progress" 
+                           [style.width.%]="getPasswordStrength()"
+                           [style.background-color]="getPasswordStrengthColor()">
+                      </div>
+                    </div>
+                  </div>
+
+                  <mat-form-field appearance="outline" class="form-field full-width">
+                    <mat-label>Confirm New Password</mat-label>
+                    <input matInput type="password" formControlName="confirmPassword" 
+                           placeholder="Confirm your new password">
+                    <mat-icon matSuffix>lock_outline</mat-icon>
+                    <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
+                      Please confirm your password
+                    </mat-error>
+                    <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
+                      Passwords do not match
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" type="submit" 
+                          [disabled]="passwordForm.invalid || isChangingPassword"
+                          class="action-button">
+                    <mat-spinner *ngIf="isChangingPassword" diameter="20"></mat-spinner>
+                    <mat-icon *ngIf="!isChangingPassword">security</mat-icon>
+                    <span *ngIf="!isChangingPassword">Change Password</span>
+                    <span *ngIf="isChangingPassword">Changing...</span>
+                  </button>
+                  <button mat-stroked-button type="button" (click)="resetPasswordForm()" class="action-button">
+                    <mat-icon>refresh</mat-icon>
+                    Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Account Information Tab -->
+        <mat-tab label="Account Info">
+          <div class="tab-content">
+            <div class="account-container">
+              <div class="account-header">
+                <h3>Account Information</h3>
+                <p>View your account details and status</p>
+              </div>
+              
+              <div class="account-grid">
+                <div class="account-item">
+                  <div class="item-icon">
+                    <mat-icon>fingerprint</mat-icon>
+                  </div>
+                  <div class="item-content">
+                    <div class="item-label">User ID</div>
+                    <div class="item-value">{{currentUser?.id}}</div>
+                  </div>
+                </div>
+
+                <div class="account-item">
+                  <div class="item-icon">
+                    <mat-icon>account_circle</mat-icon>
+                  </div>
+                  <div class="item-content">
+                    <div class="item-label">Username</div>
+                    <div class="item-value">{{currentUser?.userName}}</div>
+                  </div>
+                </div>
+
+                <div class="account-item">
+                  <div class="item-icon">
+                    <mat-icon>email</mat-icon>
+                  </div>
+                  <div class="item-content">
+                    <div class="item-label">Email Address</div>
+                    <div class="item-value">{{currentUser?.email}}</div>
+                  </div>
+                </div>
+
+                <div class="account-item">
+                  <div class="item-icon">
+                    <mat-icon>admin_panel_settings</mat-icon>
+                  </div>
+                  <div class="item-content">
+                    <div class="item-label">Roles & Permissions</div>
+                    <div class="item-value">
+                      <mat-chip-set>
+                        <mat-chip *ngFor="let role of currentUser?.roles || []" [color]="getRoleColor(role)">
+                          {{role}}
+                        </mat-chip>
+                      </mat-chip-set>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="account-item">
+                  <div class="item-icon">
+                    <mat-icon>verified_user</mat-icon>
+                  </div>
+                  <div class="item-content">
+                    <div class="item-label">Account Status</div>
+                    <div class="item-value">
+                      <mat-chip color="accent" class="status-chip">
+                        <mat-icon>check_circle</mat-icon>
+                        Active
+                      </mat-chip>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="account-item">
+                  <div class="item-icon">
+                    <mat-icon>phone</mat-icon>
+                  </div>
+                  <div class="item-content">
+                    <div class="item-label">Phone Number</div>
+                    <div class="item-value">{{currentUser?.phoneNumber || 'Not provided'}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </div>
+
+  </div>
+</div>

@@ -1,29 +1,294 @@
 <div class="manager-dashboard-container">
-  <h2>Manager Dashboard</h2>
-  <p>Welcome, Manager! Here you can review and validate pending requests.</p>
-
-  <h3>Pending Requests</h3>
-  <!-- Placeholder for a list of pending requests -->
-  <div class="pending-requests-list">
-    <p>No pending requests at the moment.</p>
-    <!-- In a real application, this would be dynamically populated -->
-    <!--
-    <ul>
-      <li *ngFor="let request of pendingRequests">
-        <h4>{{ request.type }} from {{ request.employeeName }}</h4>
-        <p>Status: {{ request.status }}</p>
-        <button>View Details</button>
-        <button>Approve</button>
-        <button>Reject</button>
-      </li>
-    </ul>
-    -->
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1>
+          <mat-icon>supervisor_account</mat-icon>
+          Manager Dashboard
+        </h1>
+        <p>Review team requests, track performance, and manage approvals</p>
+      </div>
+      <div class="header-actions">
+        <button mat-fab color="primary" class="fab-button" routerLink="/requests/approval" matTooltip="View All Approvals">
+          <mat-icon>approval</mat-icon>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <h3>Recently Approved/Rejected</h3>
-  <!-- Placeholder for a list of recently approved/rejected requests -->
-  <div class="recent-actions-list">
-    <p>No recent actions.</p>
-    <!-- In a real application, this would be dynamically populated -->
+  <!-- Loading State -->
+  <div *ngIf="loadingMetrics && loadingRequests" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading manager dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loadingMetrics || !loadingRequests" class="dashboard-content">
+
+    <!-- Manager Overview -->
+    <div class="overview-section">
+      <h2 class="section-title">Management Overview</h2>
+      <div class="overview-grid">
+        <div class="overview-card pending-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon matBadge="{{teamMetrics.pendingApprovals}}" matBadgeColor="warn" [matBadgeHidden]="teamMetrics.pendingApprovals === 0">pending_actions</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{teamMetrics.pendingApprovals}}</div>
+            <div class="overview-label">Pending Approvals</div>
+            <div class="overview-change neutral">Requires attention</div>
+          </div>
+        </div>
+
+        <div class="overview-card team-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>group</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{teamMetrics.totalTeamMembers}}</div>
+            <div class="overview-label">Team Members</div>
+            <div class="overview-change positive">Active team</div>
+          </div>
+        </div>
+
+        <div class="overview-card approved-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{teamMetrics.approvedThisMonth}}</div>
+            <div class="overview-label">Approved This Month</div>
+            <div class="overview-change positive">{{getEfficiencyScore()}}% efficiency</div>
+          </div>
+        </div>
+
+        <div class="overview-card time-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{teamMetrics.averageApprovalTime}}h</div>
+            <div class="overview-label">Avg Approval Time</div>
+            <div class="overview-change positive">Fast response</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <div *ngFor="let action of quickActions" 
+             class="action-card" 
+             matRipple 
+             (click)="action.action()">
+          <div class="action-icon" [ngClass]="'icon-' + action.color">
+            <mat-icon [matBadge]="action.count" 
+                      [matBadgeHidden]="!action.count" 
+                      matBadgeColor="warn">
+              {{action.icon}}
+            </mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>{{action.title}}</h3>
+            <p>{{action.description}}</p>
+          </div>
+          <div class="action-arrow">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Requests Section -->
+    <div class="requests-section">
+      <div class="section-header">
+        <h2 class="section-title">Team Requests Awaiting Approval</h2>
+        <div class="section-actions">
+          <button mat-raised-button color="primary" routerLink="/requests/approval">
+            <mat-icon>list</mat-icon>
+            View All Requests
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="loadingRequests" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading team requests...</p>
+      </div>
+
+      <div *ngIf="!loadingRequests && pendingRequests.length > 0" class="requests-container">
+        <div class="modern-table">
+          <!-- Table Header -->
+          <div class="table-header-row">
+            <div class="table-cell header-cell">Employee</div>
+            <div class="table-cell header-cell">Request Details</div>
+            <div class="table-cell header-cell">Type & Priority</div>
+            <div class="table-cell header-cell">Created</div>
+            <div class="table-cell header-cell actions-cell">Actions</div>
+          </div>
+
+          <!-- Table Rows -->
+          <div *ngFor="let request of pendingRequests; let i = index" class="table-row" matRipple>
+            <div class="table-cell employee-cell">
+              <div class="employee-info">
+                <div class="employee-avatar" [ngClass]="'avatar-' + (i % 4)">
+                  {{getInitials(request.initiatorName)}}
+                </div>
+                <div class="employee-details">
+                  <div class="employee-name">{{request.initiatorName}}</div>
+                  <div class="employee-meta">Team Member</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell request-cell">
+              <div class="request-info">
+                <div class="request-title">{{request.title || 'No Title'}}</div>
+                <div class="request-description" *ngIf="request.description">
+                  {{request.description}}
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell type-cell">
+              <div class="type-priority-info">
+                <mat-chip [ngClass]="getRequestTypeClass(request.type)" class="type-chip">
+                  {{getRequestTypeLabel(request.type)}}
+                </mat-chip>
+                <mat-chip [ngClass]="getPriorityClass(request)" class="priority-chip">
+                  {{getPriorityLabel(request)}}
+                </mat-chip>
+              </div>
+            </div>
+
+            <div class="table-cell date-cell">
+              <div class="date-info">
+                <div class="date-value">{{request.createdAt | date:'MMM d'}}</div>
+                <div class="time-value">{{request.createdAt | date:'shortTime'}}</div>
+              </div>
+            </div>
+
+            <div class="table-cell actions-cell">
+              <div class="action-buttons">
+                <button mat-icon-button class="action-btn primary" 
+                        [routerLink]="['/requests/details', request.id]"
+                        matTooltip="View Details">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                
+                <button mat-icon-button class="action-btn success" 
+                        (click)="quickApprove(request)" 
+                        matTooltip="Quick Approve">
+                  <mat-icon>check</mat-icon>
+                </button>
+                
+                <button mat-icon-button class="action-btn danger" 
+                        (click)="quickReject(request)" 
+                        matTooltip="Quick Reject">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!loadingRequests && pendingRequests.length === 0" class="empty-state">
+        <mat-icon>assignment_turned_in</mat-icon>
+        <h3>All Caught Up!</h3>
+        <p>No team requests pending your approval at this time</p>
+        <button mat-raised-button color="primary" routerLink="/requests/approval">
+          <mat-icon>search</mat-icon>
+          View All Requests
+        </button>
+      </div>
+    </div>
+
+    <!-- Team Overview Section -->
+    <div class="team-overview-section">
+      <div class="section-header">
+        <h2 class="section-title">Team Overview</h2>
+        <button mat-button color="primary">View Full Team</button>
+      </div>
+      
+      <div class="team-grid">
+        <div class="team-stats-card">
+          <h3>Team Performance</h3>
+          <div class="performance-metrics">
+            <div class="performance-item">
+              <div class="performance-label">Approval Rate</div>
+              <div class="performance-value">{{getApprovalPercentage() | number:'1.0-0'}}%</div>
+              <div class="performance-bar">
+                <div class="progress-fill approval" [style.width.%]="getApprovalPercentage()"></div>
+              </div>
+            </div>
+            
+            <div class="performance-item">
+              <div class="performance-label">Average Response Time</div>
+              <div class="performance-value">{{teamMetrics.averageApprovalTime}}h</div>
+              <div class="performance-description">Fast response time</div>
+            </div>
+            
+            <div class="performance-item">
+              <div class="performance-label">Monthly Activity</div>
+              <div class="performance-value">{{teamMetrics.approvedThisMonth + teamMetrics.rejectedThisMonth}}</div>
+              <div class="performance-description">Requests processed</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-members-card">
+          <h3>Team Members</h3>
+          <div class="team-members-list">
+            <div *ngFor="let member of teamMembers; let i = index" class="team-member-item">
+              <div class="member-avatar" [ngClass]="'avatar-' + (i % 4)">
+                {{member.avatar}}
+              </div>
+              <div class="member-info">
+                <div class="member-name">{{member.name}}</div>
+                <div class="member-position">{{member.position}}</div>
+              </div>
+              <div class="member-status">
+                <mat-chip *ngIf="member.pendingRequests > 0" class="pending-chip" 
+                          [matBadge]="member.pendingRequests" matBadgeSize="small">
+                  {{member.pendingRequests}} pending
+                </mat-chip>
+                <mat-chip *ngIf="member.pendingRequests === 0" class="active-chip">
+                  Active
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Activity</h2>
+        <button mat-button color="primary">View All Activity</button>
+      </div>
+      <div class="activity-container">
+        <div class="activity-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon" [ngClass]="'activity-' + activity.type">
+              <mat-icon>{{activity.icon}}</mat-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{activity.title}}</div>
+              <div class="activity-subtitle">{{activity.subtitle}}</div>
+            </div>
+            <div class="activity-time">{{activity.time}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

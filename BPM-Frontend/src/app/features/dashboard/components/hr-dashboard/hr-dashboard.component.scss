@@ -1,54 +1,825 @@
+// Modern HR Dashboard Styles
 .hr-dashboard-container {
-  padding: 20px;
-  h2 {
-    color: #333;
-    margin-bottom: 15px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+// Header Section
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2rem 3rem;
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
   }
-  h3 {
-    color: #555;
-    margin-top: 25px;
-    margin-bottom: 10px;
-  }
-  .requests-processing-list,
-  .archived-requests-list {
-    border: 1px solid #eee;
-    border-radius: 5px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    p {
-      color: #777;
-      font-style: italic;
+
+  .header-info {
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 0.5rem 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    ul {
-      list-style: none;
-      padding: 0;
-      li {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 10px;
-        margin-bottom: 10px;
-        h4 {
-          margin-top: 0;
-          margin-bottom: 5px;
-          color: #007bff;
+
+    p {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0;
+    }
+  }
+
+  .fab-button {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+// Loading State
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+
+  .loading-content {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+
+    p {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Main Dashboard Content
+.dashboard-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+  display: grid;
+  gap: 3rem;
+}
+
+// Section Titles
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Metrics Section
+.metrics-section {
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .metric-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .metric-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      mat-icon {
+        font-size: 28px;
+        color: #ffffff;
+      }
+    }
+
+    .metric-content {
+      flex: 1;
+
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1;
+      }
+
+      .metric-label {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin: 0.25rem 0;
+        font-weight: 500;
+      }
+
+      .metric-change {
+        font-size: 0.8rem;
+        font-weight: 600;
+        
+        &.positive {
+          color: #10b981;
         }
-        button {
-          margin-right: 10px;
-          padding: 8px 12px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          &.process {
-            background-color: #28a745;
-            color: white;
-          }
-          &.archive {
-            background-color: #6c757d;
-            color: white;
-          }
+        
+        &.neutral {
+          color: #f59e0b;
         }
       }
+    }
+  }
+}
+
+// Metric Icon Colors
+.employees-metric .metric-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.active-requests .metric-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.processed-metric .metric-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.efficiency-metric .metric-icon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+// Request Types Section
+.request-types-section {
+  .request-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .type-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .type-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 24px;
+        color: #ffffff;
+      }
+    }
+
+    .type-content {
+      flex: 1;
+
+      .type-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1;
+      }
+
+      .type-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}
+
+// Type Icon Colors
+.leave-type .type-icon {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.expense-type .type-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.training-type .type-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+// Quick Actions Section
+.quick-actions-section {
+  .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .action-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+
+      .action-arrow {
+        transform: translateX(5px);
+      }
+    }
+
+    .action-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.icon-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      }
+
+      &.icon-accent {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+
+      &.icon-warn {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+
+      mat-icon {
+        font-size: 24px;
+        color: #ffffff;
+      }
+    }
+
+    .action-content {
+      flex: 1;
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin: 0;
+      }
+    }
+
+    .action-arrow {
+      color: #9ca3af;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+// Main Content Section
+.main-content-section {
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+  }
+
+  .content-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .card-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+
+        mat-icon {
+          color: #6b7280;
+        }
+      }
+    }
+
+    .card-content {
+      padding: 1.5rem 2rem;
+    }
+  }
+}
+
+// Pending Requests Card
+.pending-requests {
+  .requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .request-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .request-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .request-info {
+      flex: 1;
+
+      .request-title {
+        font-weight: 500;
+        color: #1f2937;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .request-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+
+        .type-chip {
+          font-size: 0.7rem;
+          height: 20px;
+        }
+
+        .request-date {
+          font-size: 0.75rem;
+          color: #6b7280;
+        }
+      }
+
+      .request-employee {
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+    }
+
+    .request-actions {
+      display: flex;
+      gap: 0.5rem;
+
+      button {
+        width: 36px;
+        height: 36px;
+        
+        mat-icon {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+
+    mat-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+      color: #10b981;
+      margin-bottom: 1rem;
+    }
+
+    h4 {
+      margin: 0 0 0.5rem 0;
+      color: #1f2937;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Team Overview Card
+.team-overview {
+  .department-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .department-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .dept-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .dept-info {
+      flex: 1;
+
+      .dept-name {
+        font-weight: 500;
+        color: #1f2937;
+        font-size: 0.9rem;
+      }
+
+      .dept-count {
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+    }
+
+    .dept-percentage {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Recent Hires Card
+.recent-hires {
+  .hires-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .hire-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .hire-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.8rem;
+
+      &.avatar-0 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+      &.avatar-1 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+      &.avatar-2 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+      &.avatar-3 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    }
+
+    .hire-info {
+      flex: 1;
+
+      .hire-name {
+        font-weight: 500;
+        color: #1f2937;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .hire-meta {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+    }
+
+    .hire-status {
+      .status-new {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        font-size: 0.7rem;
+        height: 20px;
+      }
+    }
+  }
+}
+
+// Recent Activity Card
+.recent-activity {
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .activity-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.activity-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+
+      &.activity-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+      }
+
+      &.activity-info {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+      }
+
+      &.activity-error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+      }
+
+      mat-icon {
+        font-size: 18px;
+      }
+    }
+
+    .activity-content {
+      flex: 1;
+
+      .activity-title {
+        font-weight: 500;
+        color: #1f2937;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .activity-subtitle {
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+    }
+
+    .activity-time {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+  }
+}
+
+// HR Analytics Card
+.hr-analytics {
+  .analytics-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .analytics-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+
+    .analytics-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+
+    .analytics-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+  }
+
+  .analytics-chart {
+    .chart-placeholder {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      color: #6b7280;
+
+      mat-icon {
+        font-size: 2.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Request Type Chips
+.type-leave {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.type-expense {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.type-training {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.type-it {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.type-profile {
+  background: rgba(236, 72, 153, 0.1);
+  color: #ec4899;
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+  .content-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hr-dashboard-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .dashboard-header {
+    padding: 1.5rem;
+
+    .header-content {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .header-info h1 {
+      font-size: 2rem;
+    }
+  }
+
+  .dashboard-content {
+    padding: 1.5rem;
+    gap: 2rem;
+  }
+
+  .metrics-grid,
+  .request-types-grid,
+  .quick-actions-grid,
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header .header-info h1 {
+    font-size: 1.8rem;
+  }
+
+  .metric-card,
+  .type-card,
+  .action-card {
+    padding: 1.5rem;
+  }
+
+  .content-card {
+    .card-header,
+    .card-content {
+      padding: 1rem 1.5rem;
     }
   }
 }

@@ -1,0 +1,309 @@
+<div class="performance-reviews-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1>
+          <mat-icon>star_rate</mat-icon>
+          Performance Reviews
+        </h1>
+        <p>Manage employee performance evaluations and career development</p>
+      </div>
+      <div class="header-actions">
+        <button mat-fab color="primary" class="fab-button" (click)="exportToExcel()" matTooltip="Export Data">
+          <mat-icon>download</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading performance reviews...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="reviews-content">
+
+    <!-- Performance Overview -->
+    <div class="overview-section">
+      <h2 class="section-title">Performance Overview</h2>
+      <div class="overview-grid">
+        <div class="overview-card pending-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>assignment_turned_in</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getPendingReviews()}}</div>
+            <div class="overview-label">Pending Reviews</div>
+            <div class="overview-change neutral">Due this quarter</div>
+          </div>
+        </div>
+
+        <div class="overview-card completed-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getCompletedReviews()}}</div>
+            <div class="overview-label">Completed</div>
+            <div class="overview-change positive">+18% from last quarter</div>
+          </div>
+        </div>
+
+        <div class="overview-card overdue-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon matBadge="{{getOverdueReviews()}}" matBadgeColor="warn" [matBadgeHidden]="getOverdueReviews() === 0">schedule</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getOverdueReviews()}}</div>
+            <div class="overview-label">Overdue</div>
+            <div class="overview-change negative">Requires attention</div>
+          </div>
+        </div>
+
+        <div class="overview-card rating-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>assessment</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getAverageRating()}}</div>
+            <div class="overview-label">Average Rating</div>
+            <div class="overview-change positive">+0.3 improvement</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <div *ngFor="let action of quickActions" 
+             class="action-card" 
+             matRipple 
+             (click)="action.action()">
+          <div class="action-icon" [ngClass]="'icon-' + action.color">
+            <mat-icon [matBadge]="action.count" 
+                      [matBadgeHidden]="!action.count" 
+                      matBadgeColor="warn">
+              {{action.icon}}
+            </mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>{{action.title}}</h3>
+            <p>{{action.description}}</p>
+          </div>
+          <div class="action-arrow">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters and Controls -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <h2 class="section-title">Performance Reviews</h2>
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" (click)="createReview()">
+            <mat-icon>add</mat-icon>
+            Create Review
+          </button>
+          <button mat-raised-button color="accent" (click)="bulkUpdate()" 
+                  [disabled]="filteredReviews.length === 0">
+            <mat-icon>edit</mat-icon>
+            Bulk Update
+          </button>
+          <button mat-stroked-button (click)="clearFilters()">
+            <mat-icon>clear</mat-icon>
+            Clear Filters
+          </button>
+        </div>
+      </div>
+      
+      <div class="filters-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search reviews</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (input)="applyFilters()" 
+                 placeholder="Employee name, title, description...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="selectedStatusFilter" (selectionChange)="applyFilters()">
+            <mat-option value="">All Statuses</mat-option>
+            <mat-option value="draft">Draft</mat-option>
+            <mat-option value="in-progress">In Progress</mat-option>
+            <mat-option value="completed">Completed</mat-option>
+            <mat-option value="overdue">Overdue</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Type</mat-label>
+          <mat-select [(ngModel)]="selectedTypeFilter" (selectionChange)="applyFilters()">
+            <mat-option value="">All Types</mat-option>
+            <mat-option value="annual">Annual Review</mat-option>
+            <mat-option value="quarterly">Quarterly Review</mat-option>
+            <mat-option value="probationary">Probationary Review</mat-option>
+            <mat-option value="project">Project Review</mat-option>
+            <mat-option value="360">360-Degree Review</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Priority</mat-label>
+          <mat-select [(ngModel)]="selectedPriorityFilter" (selectionChange)="applyFilters()">
+            <mat-option value="">All Priorities</mat-option>
+            <mat-option value="low">Low</mat-option>
+            <mat-option value="medium">Medium</mat-option>
+            <mat-option value="high">High</mat-option>
+            <mat-option value="critical">Critical</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Reviews Table -->
+    <div class="reviews-section">
+      <div class="table-container">
+        <div class="modern-table">
+          <!-- Table Header -->
+          <div class="table-header-row">
+            <div class="table-cell header-cell">Employee</div>
+            <div class="table-cell header-cell">Review Details</div>
+            <div class="table-cell header-cell">Type & Priority</div>
+            <div class="table-cell header-cell">Status & Progress</div>
+            <div class="table-cell header-cell">Due Date</div>
+            <div class="table-cell header-cell actions-cell">Actions</div>
+          </div>
+
+          <!-- Table Rows -->
+          <div *ngFor="let review of filteredReviews; let i = index" class="table-row" matRipple>
+            <div class="table-cell employee-cell">
+              <div class="employee-info">
+                <div class="employee-avatar" [ngClass]="'avatar-' + (i % 4)">
+                  {{getInitials(review.employeeName)}}
+                </div>
+                <div class="employee-details">
+                  <div class="employee-name">{{review.employeeName}}</div>
+                  <div class="employee-position">{{review.employeePosition}}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell review-cell">
+              <div class="review-info">
+                <div class="review-title">{{review.title}}</div>
+                <div class="review-description" *ngIf="review.description">
+                  {{review.description}}
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell type-cell">
+              <div class="type-priority-info">
+                <mat-chip class="type-chip">
+                  {{getReviewTypeDisplay(review.reviewType)}}
+                </mat-chip>
+                <mat-chip [ngClass]="'priority-' + getPriorityClass(review.priority)" class="priority-chip">
+                  {{getPriorityDisplay(review.priority)}}
+                </mat-chip>
+              </div>
+            </div>
+
+            <div class="table-cell status-cell">
+              <div class="status-progress-info">
+                <mat-chip [ngClass]="getStatusClass(review.status)" class="status-chip">
+                  <mat-icon *ngIf="review.status === 0">edit</mat-icon>
+                  <mat-icon *ngIf="review.status === 1">schedule</mat-icon>
+                  <mat-icon *ngIf="review.status === 2">check_circle</mat-icon>
+                  <mat-icon *ngIf="review.status === 3">warning</mat-icon>
+                  {{getStatusDisplay(review.status)}}
+                </mat-chip>
+                <div class="progress-container">
+                  <mat-progress-bar mode="determinate" [value]="review.progress"></mat-progress-bar>
+                  <span class="progress-text">{{review.progress}}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell date-cell">
+              <div class="date-info" [ngClass]="{'overdue': isOverdue(review.dueDate)}">
+                <mat-icon *ngIf="isOverdue(review.dueDate)" class="overdue-icon">warning</mat-icon>
+                <div class="date-value">{{review.dueDate | date:'MMM d'}}</div>
+                <div class="year-value">{{review.dueDate | date:'yyyy'}}</div>
+              </div>
+            </div>
+
+            <div class="table-cell actions-cell">
+              <div class="action-buttons">
+                <button mat-icon-button class="action-btn primary" 
+                        (click)="viewReview(review)" 
+                        matTooltip="View Details">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                
+                <button mat-icon-button class="action-btn secondary" 
+                        (click)="editReview(review)" 
+                        matTooltip="Edit Review">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                
+                <button mat-icon-button [matMenuTriggerFor]="actionMenu" 
+                        class="action-btn menu" 
+                        matTooltip="More Actions">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              </div>
+
+              <mat-menu #actionMenu="matMenu" class="review-menu">
+                <button mat-menu-item (click)="duplicateReview(review)">
+                  <mat-icon>content_copy</mat-icon>
+                  Duplicate
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteReview(review)" class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  Delete
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="filteredReviews.length === 0" class="empty-state">
+            <mat-icon>search_off</mat-icon>
+            <h3>No performance reviews found</h3>
+            <p>Try adjusting your search or filter criteria, or create a new review</p>
+            <button mat-raised-button color="primary" (click)="createReview()">
+              <mat-icon>add</mat-icon>
+              Create First Review
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Activity</h2>
+        <button mat-button color="primary">View All Activity</button>
+      </div>
+      <div class="activity-container">
+        <div class="activity-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon" [ngClass]="'activity-' + activity.type">
+              <mat-icon>{{activity.icon}}</mat-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{activity.title}}</div>
+              <div class="activity-subtitle">{{activity.subtitle}}</div>
+            </div>
+            <div class="activity-time">

@@ -10,15 +10,15 @@ import { NotificationDto } from '../models/notification.models';
 })
 export class SignalRService {
   private hubConnection: HubConnection | null = null;
-  private connectionStateSubject = new BehaviorSubject<boolean>(false);
-  private notificationSubject = new BehaviorSubject<NotificationDto | null>(null);
-  private requestUpdateSubject = new BehaviorSubject<string | null>(null);
+  private readonly connectionStateSubject = new BehaviorSubject<boolean>(false);
+  private readonly notificationSubject = new BehaviorSubject<NotificationDto | null>(null);
+  private readonly requestUpdateSubject = new BehaviorSubject<string | null>(null);
 
   public connectionState$ = this.connectionStateSubject.asObservable();
   public notification$ = this.notificationSubject.asObservable();
   public requestUpdate$ = this.requestUpdateSubject.asObservable();
 
-  constructor(private authService: AuthService) {
+  constructor(private readonly authService: AuthService) {
     this.authService.isAuthenticated$.subscribe(isAuth => {
       if (isAuth) {
         this.startConnection();

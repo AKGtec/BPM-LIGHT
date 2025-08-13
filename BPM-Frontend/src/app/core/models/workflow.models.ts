@@ -2,7 +2,6 @@ export interface BaseDto {
   id: string;
   createdAt: Date;
   updatedAt?: Date;
-  isDeleted: boolean;
 }
 
 export interface WorkflowDto extends BaseDto {

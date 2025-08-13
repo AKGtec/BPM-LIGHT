@@ -1,30 +1,199 @@
-<div class="reporting-dashboard-container">
-  <h2>Reporting Dashboard</h2>
-  <p>
-    Welcome to the Reporting Dashboard! Here you can view various statistics and
-    generate reports.
-  </p>
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="greeting">
+        <h1>Welcome back, {{ currentUser?.userName || 'Admin' }} 👋</h1>
+        <p>Your central hub for system health, trends, and quick actions.</p>
+      </div>
+      <div class="header-actions">
+        <div class="period-toggle">
+          <mat-chip-set>
+            <mat-chip-option
+              [selected]="period === 'daily'"
+              (click)="setPeriod('daily')"
+              (keydown.enter)="setPeriod('daily')"
+              (keydown.space)="setPeriod('daily')"
+            >Daily</mat-chip-option>
+            <mat-chip-option
+              [selected]="period === 'weekly'"
+              (click)="setPeriod('weekly')"
+              (keydown.enter)="setPeriod('weekly')"
+              (keydown.space)="setPeriod('weekly')"
+            >Weekly</mat-chip-option>
+            <mat-chip-option
+              [selected]="period === 'monthly'"
+              (click)="setPeriod('monthly')"
+              (keydown.enter)="setPeriod('monthly')"
+              (keydown.space)="setPeriod('monthly')"
+            >Monthly</mat-chip-option>
+          </mat-chip-set>
+        </div>
+        <button mat-fab color="primary" class="fab-button" (click)="navigateTo('/admin/settings')" matTooltip="System Settings">
+          <mat-icon>tune</mat-icon>
+        </button>
+      </div>
+    </div>
+  </header>
 
-  <div class="stats-section">
-    <h3>Process Statistics</h3>
-    <ul>
-      <li>Average processing time: XX days</li>
-      <li>Total requests submitted: XX</li>
-      <li>Requests by type: (Chart Placeholder)</li>
-      <li>Validation rates: (Chart Placeholder)</li>
-    </ul>
-  </div>
+  <!-- Loading -->
+  <section *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Preparing your dashboard...</p>
+    </div>
+  </section>
 
-  <div class="report-generation-section">
-    <h3>Generate Reports</h3>
-    <p>Select report type and export format:</p>
-    <button>Export to PDF</button>
-    <button>Export to Excel</button>
-  </div>
+  <!-- Content -->
+  <main *ngIf="!isLoading" class="dashboard-content">
 
-  <div class="logs-section">
-    <h3>Action Logs</h3>
-    <!-- Placeholder for a table of recent actions/logs -->
-    <p>Recent actions will be displayed here.</p>
-  </div>
+    <!-- KPI Cards -->
+    <section class="metrics-section">
+      <h2 class="section-title">System Overview</h2>
+      <div class="metrics-grid">
+        <div class="metric-card users-metric" matRipple>
+          <div class="metric-icon"><mat-icon>people</mat-icon></div>
+          <div class="metric-content">
+            <div class="metric-value">{{ systemStats.totalUsers | number }}</div>
+            <div class="metric-label">Total Users</div>
+            <div class="metric-change positive">{{ activeUsers | number }} active today</div>
+          </div>
+        </div>
+
+        <div class="metric-card workflows-metric" matRipple>
+          <div class="metric-icon"><mat-icon>account_tree</mat-icon></div>
+          <div class="metric-content">
+            <div class="metric-value">{{ systemStats.activeWorkflows | number }}</div>
+            <div class="metric-label">Active Workflows</div>
+            <div class="metric-change positive">Total {{ totalWorkflows | number }} workflows</div>
+          </div>
+        </div>
+
+        <div class="metric-card requests-metric" matRipple>
+          <div class="metric-icon"><mat-icon>trending_up</mat-icon></div>
+          <div class="metric-content">
+            <div class="metric-value">{{ systemStats.totalRequests | number }}</div>
+            <div class="metric-label">Total Requests</div>
+            <div class="metric-change positive">Approval {{ approvalRate | number:'1.0-0' }}%</div>
+          </div>
+        </div>
+
+        <div class="metric-card approvals-metric" matRipple>
+          <div class="metric-icon"><mat-icon>pending_actions</mat-icon></div>
+          <div class="metric-content">
+            <div class="metric-value">{{ systemStats.pendingApprovals | number }}</div>
+            <div class="metric-label">Pending Approvals</div>
+            <div class="metric-change neutral">Pending needs approval</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="charts-section">
+      <div class="chart-container requests-chart">
+        <div class="chart-header">
+          <h3>Requests by Type</h3>
+          <mat-chip-set>
+            <mat-chip>{{ period | titlecase }}</mat-chip>
+          </mat-chip-set>
+        </div>
+        <div class="chart-content">
+          <canvas id="requestsByTypeChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-container workflow-chart">
+        <div class="chart-header">
+          <h3>Requests by Status</h3>
+          <mat-chip-set>
+            <mat-chip>Distribution</mat-chip>
+          </mat-chip-set>
+        </div>
+        <div class="chart-content">
+          <canvas id="workflowStatusChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="actions-grid">
+        <div class="action-card" matRipple (click)="navigateTo('/admin/users')" role="button" tabindex="0" (keydown.enter)="navigateTo('/admin/users')" (keydown.space)="navigateTo('/admin/users')">
+          <div class="action-icon users-action"><mat-icon>manage_accounts</mat-icon></div>
+          <div class="action-content">
+            <h3>User Management</h3>
+            <p>Manage users, roles, and permissions</p>
+          </div>
+          <div class="action-arrow"><mat-icon>arrow_forward</mat-icon></div>
+        </div>
+
+        <div class="action-card" matRipple (click)="navigateTo('/admin/workflows')" role="button" tabindex="0" (keydown.enter)="navigateTo('/admin/workflows')" (keydown.space)="navigateTo('/admin/workflows')">
+          <div class="action-icon workflows-action"><mat-icon>settings</mat-icon></div>
+          <div class="action-content">
+            <h3>Workflow Designer</h3>
+            <p>Create and configure workflows</p>
+          </div>
+          <div class="action-arrow"><mat-icon>arrow_forward</mat-icon></div>
+        </div>
+
+        <div class="action-card" matRipple (click)="navigateTo('/admin/reports')" role="button" tabindex="0" (keydown.enter)="navigateTo('/admin/reports')" (keydown.space)="navigateTo('/admin/reports')">
+          <div class="action-icon reports-action"><mat-icon>analytics</mat-icon></div>
+          <div class="action-content">
+            <h3>System Reports</h3>
+            <p>Generate detailed system reports</p>
+          </div>
+          <div class="action-arrow"><mat-icon>arrow_forward</mat-icon></div>
+        </div>
+
+        <div class="action-card" matRipple (click)="navigateTo('/admin/settings')" role="button" tabindex="0" (keydown.enter)="navigateTo('/admin/settings')" (keydown.space)="navigateTo('/admin/settings')">
+          <div class="action-icon settings-action"><mat-icon>tune</mat-icon></div>
+          <div class="action-content">
+            <h3>System Settings</h3>
+            <p>Configure system preferences</p>
+          </div>
+          <div class="action-arrow"><mat-icon>arrow_forward</mat-icon></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Activity + Export -->
+    <section class="bottom-section">
+      <div class="activity-section">
+        <div class="section-header">
+          <h2 class="section-title">Recent Activity</h2>
+          <button mat-button color="primary" (click)="navigateTo('/admin/reports')">View All</button>
+        </div>
+        <div class="activity-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon">
+              <mat-icon [color]="getActivityColor(activity.type)">{{ getActivityIcon(activity.type) }}</mat-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-action">{{ activity.action }}</div>
+              <div class="activity-user">{{ activity.user }}</div>
+            </div>
+            <div class="activity-time">{{ activity.time }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="export-section">
+        <div class="section-header">
+          <h2 class="section-title">Export Data</h2>
+        </div>
+        <div class="export-options">
+          <button mat-raised-button color="accent" class="export-btn" (click)="exportUsersExcel()">
+            <mat-icon>table_chart</mat-icon>
+            Export Users (Excel)
+          </button>
+          <button mat-stroked-button class="export-btn" (click)="navigateTo('/admin/reports')">
+            <mat-icon>bar_chart</mat-icon>
+            Analytics Report
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>

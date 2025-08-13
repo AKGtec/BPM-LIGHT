@@ -1,32 +1,172 @@
 .admin-layout {
-  display: flex;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  .sidebar {
-    width: 200px;
-    background-color: #f0f0f0;
-    padding: 20px;
+.sidenav-container {
+  flex: 1;
+  background-color: #fafafa;
+}
 
-    nav ul {
-      list-style: none;
-      padding: 0;
+.sidenav {
+  width: 280px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-right: none;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
 
-      li a {
-        display: block;
-        padding: 10px 0;
-        text-decoration: none;
-        color: #333;
+.sidebar-header {
+  padding: 2rem 1.5rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
 
-        &.active {
-          font-weight: bold;
-          color: #007bff;
-        }
-      }
+.admin-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sidebar-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+
+.sidebar-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-menu {
+  padding: 0;
+}
+
+.nav-section {
+  padding: 1rem 1.5rem 0.5rem;
+  margin-top: 1rem;
+}
+
+.nav-section:first-child {
+  margin-top: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.section-title mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+// Override Material list item styles
+.nav-menu a[mat-list-item] {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0.25rem 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  &.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 500;
+    
+    mat-icon {
+      color: white;
     }
   }
+  
+  mat-icon {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s ease;
+  }
+  
+  span {
+    font-size: 0.95rem;
+  }
+}
 
-  .content {
-    flex-grow: 1;
-    padding: 20px;
+.main-content {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  overflow-x: auto;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .sidenav {
+    width: 100%;
+    position: fixed;
+    z-index: 1000;
+  }
+  
+  .sidebar-header {
+    padding: 1.5rem 1rem 1rem;
+  }
+  
+  .admin-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .sidebar-header h2 {
+    font-size: 1.3rem;
+  }
+}
+
+// Custom scrollbar for sidebar
+.sidenav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidenav::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidenav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidenav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+// Animation for content loading
+.main-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,35 +1,36 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-// Components
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { EmployeeDashboardComponent } from './components/employee-dashboard/employee-dashboard.component';
-import { ManagerDashboardComponent } from './components/manager-dashboard/manager-dashboard.component';
-import { HRDashboardComponent } from './components/hr-dashboard/hr-dashboard.component';
-import { ReportingDashboardComponent } from './components/reporting-dashboard/reporting-dashboard.component';
+// All components are now loaded dynamically
+
 
 const routes = [
   {
     path: '',
-    component: DashboardComponent
+    loadComponent: () => import('./components/dashboard/dashboard.component').then(c => c.DashboardComponent)
   },
   {
     path: 'employee',
-    component: EmployeeDashboardComponent
+    loadComponent: () => import('./components/employee-dashboard/employee-dashboard.component').then(c => c.EmployeeDashboardComponent)
   },
   {
     path: 'manager',
-    component: ManagerDashboardComponent,
+    loadComponent: () => import('./components/manager-dashboard/manager-dashboard.component').then(c => c.ManagerDashboardComponent),
     data: { roles: ['Manager', 'Admin'] }
   },
   {
     path: 'hr',
-    component: HRDashboardComponent,
+    loadComponent: () => import('./components/hr-dashboard/hr-dashboard.component').then(c => c.HRDashboardComponent),
     data: { roles: ['HR', 'Admin'] }
   },
   {
     path: 'reports',
-    component: ReportingDashboardComponent,
+    loadComponent: () => import('./components/reporting-dashboard/reporting-dashboard.component').then(c => c.ReportingDashboardComponent),
+    data: { roles: ['Manager', 'HR', 'Admin'] }
+  },
+  {
+    path: 'reporting',
+    loadComponent: () => import('./components/reporting-dashboard/reporting-dashboard.component').then(c => c.ReportingDashboardComponent),
     data: { roles: ['Manager', 'HR', 'Admin'] }
   }
 ];

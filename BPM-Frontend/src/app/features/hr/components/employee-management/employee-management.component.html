@@ -1,0 +1,241 @@
+<div class="employee-management-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1>
+          <mat-icon>badge</mat-icon>
+          Employee Management
+        </h1>
+        <p>Manage employee records, status, and organizational structure</p>
+      </div>
+      <div class="header-actions">
+        <button mat-fab color="primary" class="fab-button" (click)="exportToExcel()" matTooltip="Export Data">
+          <mat-icon>download</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Loading employee data...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="employee-content">
+
+    <!-- Employee Overview -->
+    <div class="overview-section">
+      <h2 class="section-title">Employee Overview</h2>
+      <div class="overview-grid">
+        <div class="overview-card active-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getActiveCount()}}</div>
+            <div class="overview-label">Active Employees</div>
+            <div class="overview-change positive">{{((getActiveCount() / getTotalCount()) * 100 | number:'1.0-0')}}% of workforce</div>
+          </div>
+        </div>
+
+        <div class="overview-card leave-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon matBadge="{{getOnLeaveCount()}}" matBadgeColor="warn" [matBadgeHidden]="getOnLeaveCount() === 0">schedule</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getOnLeaveCount()}}</div>
+            <div class="overview-label">On Leave</div>
+            <div class="overview-change neutral">Currently away</div>
+          </div>
+        </div>
+
+        <div class="overview-card experience-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getAverageYearsOfService()}}</div>
+            <div class="overview-label">Avg Years of Service</div>
+            <div class="overview-change positive">Experienced team</div>
+          </div>
+        </div>
+
+        <div class="overview-card total-card" matRipple>
+          <div class="overview-icon">
+            <mat-icon>business</mat-icon>
+          </div>
+          <div class="overview-content">
+            <div class="overview-value">{{getTotalCount()}}</div>
+            <div class="overview-label">Total Employees</div>
+            <div class="overview-change positive">Growing organization</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <div *ngFor="let action of quickActions" 
+             class="action-card" 
+             matRipple 
+             (click)="action.action()">
+          <div class="action-icon" [ngClass]="'icon-' + action.color">
+            <mat-icon [matBadge]="action.count" 
+                      [matBadgeHidden]="!action.count" 
+                      matBadgeColor="warn">
+              {{action.icon}}
+            </mat-icon>
+          </div>
+          <div class="action-content">
+            <h3>{{action.title}}</h3>
+            <p>{{action.description}}</p>
+          </div>
+          <div class="action-arrow">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Department Overview -->
+    <div class="department-section">
+      <h2 class="section-title">Department Overview</h2>
+      <div class="department-container">
+        <div class="department-stats">
+          <div *ngFor="let dept of departmentStats" class="department-item">
+            <div class="dept-icon" [style.background-color]="dept.color">
+              {{getDepartmentInitial(dept.department)}}
+            </div>
+            <div class="dept-info">
+              <div class="dept-name">{{dept.department}}</div>
+              <div class="dept-count">{{dept.count}} employees</div>
+            </div>
+            <div class="dept-percentage">{{dept.percentage}}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters and Controls -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <h2 class="section-title">Employee Directory</h2>
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" (click)="addEmployee()">
+            <mat-icon>person_add</mat-icon>
+            Add Employee
+          </button>
+          <button mat-raised-button color="accent" (click)="bulkUpdate()" 
+                  [disabled]="filteredEmployees.length === 0">
+            <mat-icon>edit</mat-icon>
+            Bulk Update
+          </button>
+          <button mat-stroked-button (click)="clearFilters()">
+            <mat-icon>clear</mat-icon>
+            Clear Filters
+          </button>
+        </div>
+      </div>
+      
+      <div class="filters-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search employees</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (input)="applyFilters()" 
+                 placeholder="Name, email, or ID...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Department</mat-label>
+          <mat-select [(ngModel)]="selectedDepartment" (selectionChange)="applyFilters()">
+            <mat-option value="">All Departments</mat-option>
+            <mat-option *ngFor="let dept of departments" [value]="dept">{{dept}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Position</mat-label>
+          <mat-select [(ngModel)]="selectedPosition" (selectionChange)="applyFilters()">
+            <mat-option value="">All Positions</mat-option>
+            <mat-option *ngFor="let pos of positions" [value]="pos">{{pos}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
+            <mat-option value="">All Statuses</mat-option>
+            <mat-option value="Active">Active</mat-option>
+            <mat-option value="Inactive">Inactive</mat-option>
+            <mat-option value="On Leave">On Leave</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Employee Table -->
+    <div class="employees-section">
+      <div class="table-container">
+        <div class="modern-table">
+          <!-- Table Header -->
+          <div class="table-header-row">
+            <div class="table-cell header-cell">Employee</div>
+            <div class="table-cell header-cell">Department & Position</div>
+            <div class="table-cell header-cell">Manager</div>
+            <div class="table-cell header-cell">Status & Performance</div>
+            <div class="table-cell header-cell">Hire Date</div>
+            <div class="table-cell header-cell actions-cell">Actions</div>
+          </div>
+
+          <!-- Table Rows -->
+          <div *ngFor="let employee of filteredEmployees; let i = index" class="table-row" matRipple>
+            <div class="table-cell employee-cell">
+              <div class="employee-info">
+                <div class="employee-avatar" [ngClass]="'avatar-' + (i % 4)">
+                  {{getInitials(employee.firstName, employee.lastName)}}
+                </div>
+                <div class="employee-details">
+                  <div class="employee-name">{{employee.firstName}} {{employee.lastName}}</div>
+                  <div class="employee-email">{{employee.email}}</div>
+                  <div class="employee-experience">{{employee.yearsOfService}} years experience</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-cell department-cell">
+              <div class="department-info">
+                <div class="department-name">{{employee.department}}</div>
+                <div class="position-name">{{employee.position}}</div>
+              </div>
+            </div>
+
+            <div class="table-cell manager-cell">
+              <div class="manager-info">
+                <div class="manager-name">{{employee.manager}}</div>
+              </div>
+            </div>
+
+            <div class="table-cell status-cell">
+              <div class="status-performance-info">
+                <mat-chip [ngClass]="getStatusClass(employee.status)" class="status-chip">
+                  <mat-icon *ngIf="employee.status === 'Active'">check_circle</mat-icon>
+                  <mat-icon *ngIf="employee.status === 'Inactive'">cancel</mat-icon>
+                  <mat-icon *ngIf="employee.status === 'On Leave'">schedule</mat-icon>
+                  {{employee.status}}
+                </mat-chip>
+                <div class="performance-rating" *ngIf="employee.performanceRating">
+                  <div class="stars-container">
+                    <mat-icon *ngFor="let star of [1,2,3,4,5]" 
+                             [class.filled]="star <= employee.performanceRating!">
+                      star
+                    </mat-icon>
+                  </div>
+                  <span class="rating-text">{{employee.performanceRating}}.0</span>
+                </div>

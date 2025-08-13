@@ -1,0 +1,926 @@
+// Modern Employee Management Styles
+.employee-management-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+// Header Section
+.page-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2rem 3rem;
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .header-info {
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 0.5rem 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0;
+    }
+  }
+
+  .fab-button {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+// Loading State
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+
+  .loading-content {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+
+    p {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Main Content
+.employee-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+  display: grid;
+  gap: 3rem;
+}
+
+// Section Titles
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Overview Section
+.overview-section {
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .overview-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .overview-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      mat-icon {
+        font-size: 28px;
+        color: #ffffff;
+      }
+    }
+
+    .overview-content {
+      flex: 1;
+
+      .overview-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1;
+      }
+
+      .overview-label {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin: 0.25rem 0;
+        font-weight: 500;
+      }
+
+      .overview-change {
+        font-size: 0.8rem;
+        font-weight: 600;
+        
+        &.positive {
+          color: #10b981;
+        }
+        
+        &.neutral {
+          color: #f59e0b;
+        }
+      }
+    }
+  }
+}
+
+// Overview Icon Colors
+.active-card .overview-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.leave-card .overview-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.experience-card .overview-icon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.total-card .overview-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+// Quick Actions Section
+.quick-actions-section {
+  .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .action-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+
+      .action-arrow {
+        transform: translateX(5px);
+      }
+    }
+
+    .action-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.icon-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      }
+
+      &.icon-accent {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+
+      &.icon-warn {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+
+      mat-icon {
+        font-size: 24px;
+        color: #ffffff;
+      }
+    }
+
+    .action-content {
+      flex: 1;
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin: 0;
+      }
+    }
+
+    .action-arrow {
+      color: #9ca3af;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+// Department Section
+.department-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  .section-title {
+    color: #1f2937;
+    text-shadow: none;
+  }
+
+  .department-container {
+    .department-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .department-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      .dept-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      .dept-info {
+        flex: 1;
+
+        .dept-name {
+          font-weight: 600;
+          color: #1f2937;
+          font-size: 1rem;
+          margin-bottom: 0.25rem;
+        }
+
+        .dept-count {
+          font-size: 0.85rem;
+          color: #6b7280;
+        }
+      }
+
+      .dept-percentage {
+        font-weight: 700;
+        color: #1f2937;
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+// Filters Section
+.filters-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  .filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .section-title {
+      color: #1f2937;
+      text-shadow: none;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 1rem;
+
+      button {
+        border-radius: 12px;
+        
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .filters-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 1.5rem;
+    align-items: center;
+
+    .search-field,
+    .filter-field {
+      .mat-mdc-form-field {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Employees Section
+.employees-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  .table-container {
+    overflow-x: auto;
+  }
+}
+
+// Modern Table Styles
+.modern-table {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  .table-header-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 1fr 2fr 1fr 1.5fr;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 0;
+
+    .header-cell {
+      padding: 0 1.5rem;
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 1fr 2fr 1fr 1.5fr;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: #f8fafc;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .table-cell {
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+// Employee Cell Styles
+.employee-cell {
+  .employee-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .employee-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 1rem;
+
+    &.avatar-0 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    &.avatar-1 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    &.avatar-2 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    &.avatar-3 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+  }
+
+  .employee-details {
+    flex: 1;
+  }
+
+  .employee-name {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .employee-email {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+  }
+
+  .employee-experience {
+    font-size: 0.75rem;
+    color: #9ca3af;
+  }
+}
+
+// Department Cell Styles
+.department-cell {
+  .department-info {
+    flex: 1;
+  }
+
+  .department-name {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .position-name {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+}
+
+// Manager Cell Styles
+.manager-cell {
+  .manager-info {
+    flex: 1;
+  }
+
+  .manager-name {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 0.9rem;
+  }
+}
+
+// Status Cell Styles
+.status-cell {
+  .status-performance-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .status-chip {
+    font-size: 0.7rem;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    align-self: flex-start;
+
+    mat-icon {
+      font-size: 14px;
+    }
+  }
+
+  .status-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+  }
+
+  .status-inactive {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+  }
+
+  .status-on-leave {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+  }
+
+  .performance-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .stars-container {
+      display: flex;
+      gap: 2px;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        color: #e5e7eb;
+
+        &.filled {
+          color: #fbbf24;
+        }
+      }
+    }
+
+    .rating-text {
+      font-size: 0.75rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+  }
+}
+
+// Date Cell Styles
+.date-cell {
+  .date-info {
+    text-align: center;
+  }
+
+  .hire-date {
+    font-size: 0.85rem;
+    color: #1f2937;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .years-service {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+}
+
+// Actions Cell Styles
+.actions-cell {
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &.primary {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+
+      &:hover {
+        background: rgba(59, 130, 246, 0.2);
+      }
+    }
+
+    &.secondary {
+      background: rgba(107, 114, 128, 0.1);
+      color: #6b7280;
+
+      &:hover {
+        background: rgba(107, 114, 128, 0.2);
+      }
+    }
+
+    &.info {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+
+      &:hover {
+        background: rgba(16, 185, 129, 0.2);
+      }
+    }
+
+    &.menu {
+      background: rgba(156, 163, 175, 0.1);
+      color: #9ca3af;
+
+      &:hover {
+        background: rgba(156, 163, 175, 0.2);
+      }
+    }
+
+    mat-icon {
+      font-size: 18px;
+    }
+  }
+}
+
+// Employee Menu Styles
+.employee-menu {
+  .mat-menu-content {
+    padding: 0.5rem 0;
+  }
+
+  .mat-menu-item {
+    height: 44px;
+    
+    mat-icon {
+      margin-right: 12px;
+      font-size: 18px;
+    }
+
+    &.delete-action {
+      color: #ef4444;
+    }
+  }
+}
+
+// Empty State
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  p {
+    margin: 0 0 1.5rem 0;
+    opacity: 0.8;
+  }
+}
+
+// Activity Section
+.activity-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .section-title {
+      color: #1f2937;
+      text-shadow: none;
+    }
+  }
+
+  .activity-container {
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.activity-success {
+          background: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+        }
+
+        &.activity-warning {
+          background: rgba(245, 158, 11, 0.1);
+          color: #f59e0b;
+        }
+
+        &.activity-info {
+          background: rgba(59, 130, 246, 0.1);
+          color: #3b82f6;
+        }
+
+        &.activity-error {
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+        }
+
+        mat-icon {
+          font-size: 20px;
+        }
+      }
+
+      .activity-content {
+        flex: 1;
+
+        .activity-title {
+          font-weight: 500;
+          color: #1f2937;
+          font-size: 0.9rem;
+          margin-bottom: 0.25rem;
+        }
+
+        .activity-subtitle {
+          font-size: 0.8rem;
+          color: #6b7280;
+        }
+      }
+
+      .activity-time {
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+  .filters-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    .search-field {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .modern-table {
+    .table-header-row,
+    .table-row {
+      grid-template-columns: 1fr;
+      
+      .table-cell {
+        padding: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .header-cell {
+        display: none;
+      }
+
+      .table-cell::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6b7280;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-management-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .page-header {
+    padding: 1.5rem;
+
+    .header-content {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .header-info h1 {
+      font-size: 2rem;
+    }
+  }
+
+  .employee-content {
+    padding: 1.5rem;
+    gap: 2rem;
+  }
+
+  .overview-grid,
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+
+    .filter-actions {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  .filters-container {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-cell .employee-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .action-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header .header-info h1 {
+    font-size: 1.8rem;
+  }
+
+  .overview-card,
+  .action-card {
+    padding: 1.5rem;
+  }
+
+  .filters-section,
+  .employees-section,
+  .department-section,
+  .activity-section {
+    padding: 1rem 1.5rem;
+  }
+
+  .filter-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .employee-avatar {
+    width: 48px;
+    height: 48px;
+  }
+}
